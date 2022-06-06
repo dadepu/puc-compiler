@@ -1,0 +1,4 @@
+package pretty
+
+class PrettyPrint {
+}
