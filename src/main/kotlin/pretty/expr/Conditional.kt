@@ -45,83 +45,143 @@ data class Conditional(
 
 
     override fun generateOutput(f: (LineMode) -> Format): Pair<LineMode, List<Line>> {
-        val firstLineIndent = f(LineMode.SINGLE).firstLineReservedIndent
-        val firstLineChars = f(LineMode.SINGLE).firstLineReservedChars + "if  then  else ".length
-        val regularIndent = f(LineMode.MULTI).regularIndent + 1
-        val condFormat: (LineMode) -> Format = { mode ->
-            when(mode) {
-                LineMode.SINGLE -> Format(true, firstLineIndent, firstLineChars, regularIndent)
-                LineMode.MULTI -> Format(true, firstLineIndent, firstLineChars, regularIndent)
-            }
-        }
-        val branchFormat: (LineMode) -> Format = { mode ->
-            when(mode) {
-                LineMode.SINGLE -> Format(true, firstLineIndent, firstLineChars, regularIndent)
-                LineMode.MULTI -> Format(false, 0, 0, regularIndent)
-            }
-        }
-        val cond = exprCond.generateOutput(condFormat)
-        val trueBranch = exprTrue.generateOutput(branchFormat)
-        val falseBranch = exprFalse.generateOutput(branchFormat)
+        val parentSingleFormat = f(LineMode.SINGLE)
+        val parentMultiFormat = f(LineMode.MULTI)
 
-        return if (fitsSingleLine(f(LineMode.SINGLE), cond, trueBranch, falseBranch)) {
-            Pair(
-                LineMode.SINGLE,
-                listOf(generateSingleLine(cond.second.first(), trueBranch.second.first(), falseBranch.second.first(), f(
-                    LineMode.SINGLE
-                )))
-            )
-        } else if (fitsSingleLine(f(LineMode.SINGLE), cond)) {
-            Pair(
-                LineMode.MULTI,
-                generateBodyMultiLine(cond.second.first(), trueBranch.second, falseBranch.second, f(LineMode.MULTI))
-            )
+        val updatedCondFormats = enrichFormat(Pair(enrichSingleLineFormat, enrichCondMultiLineFormat)) (f)
+        val updatedBranchFormats = enrichFormat(Pair(enrichSingleLineFormat, enrichBranchMultiLineFormat)) (f)
+
+        val cond = exprCond.generateOutput(updatedCondFormats)
+        val trueBranch = exprTrue.generateOutput(updatedBranchFormats)
+        val falseBranch = exprFalse.generateOutput(updatedBranchFormats)
+
+        return if (printsAllInSingleLine(parentSingleFormat) (Triple(cond, trueBranch, falseBranch))) {
+            Pair(LineMode.SINGLE, makeSingleLineOutput(parentSingleFormat) (
+                Triple(cond.second.first(), trueBranch.second.first(), falseBranch.second.first())
+            ))
+        } else if (printsCondInSingleLine(parentSingleFormat) (cond)) {
+            Pair(LineMode.MULTI, makeBodyMultiLineOutput(parentMultiFormat) (
+                Triple(cond.second.first(), trueBranch.second, falseBranch.second)
+            ))
         } else {
-            Pair(
-                LineMode.MULTI,
-                generateFullMultiLine(cond.second, trueBranch.second, falseBranch.second, f(LineMode.MULTI))
-            )
+            Pair(LineMode.MULTI, makeFullMultiLineOutput(parentMultiFormat) (
+                Triple(cond.second, trueBranch.second, falseBranch.second)
+            ))
         }
     }
 
-    //TODO pay attention to continues first line boolean!
+    private val makeSingleLineOutput: (Format) -> (Triple<Line, Line, Line>) -> List<Line>
+        get() = { format -> { childContents ->
+            println("makeSingleLineOutput")
+            listOf(
+                Line(format.regularIndent, singleLineFullConditional(Triple(
+                        childContents.first.content, childContents.second.content, childContents.third.content)
+                    )
+                )
+            )
+        }}
 
-    private fun generateSingleLine(cond: Line, thenBody: Line, elseBody: Line, parentFormat: Format): Line {
-        return Line(parentFormat.firstLineReservedIndent, "if ${cond.content} then ${thenBody.content} else ${elseBody.content}")
-    }
+    private val makeBodyMultiLineOutput: (Format) -> (Triple<Line, List<Line>, List<Line>>) -> List<Line>
+        get() = { format -> { childContents ->
+            println("makeBodyMultiLineOutput")
+            val firstLine = listOf(Line(format.regularIndent, firstLineSingleLineCondition(childContents.first.content)))
+            val elseLine = listOf(Line(format.regularIndent, multiLineElseToken()))
 
-    private fun generateBodyMultiLine(cond: Line, thenBody: List<Line>, elseBody: List<Line>, parentFormat: Format): List<Line> {
-        return listOf(
-            listOf(Line(parentFormat.regularIndent, "if ${cond.content} then")),
-            thenBody,
-            listOf(Line(parentFormat.regularIndent, "else")),
-            elseBody
-        ).flatten()
-    }
+            firstLine + childContents.second + elseLine + childContents.third
+        }}
 
-    private fun generateFullMultiLine(cond: List<Line>, thenBody: List<Line>, elseBody: List<Line>, parentFormat: Format): List<Line> {
-        val first: (List<Line>) -> Line = { list -> list.first() }
-        val exceptFirst: (List<Line>) -> List<Line> = { list -> list.filterIndexed { index, _ -> index != 0 } }
-        return listOf(
-            listOf(Line(parentFormat.regularIndent, "if ${first(cond).content}")),
-            exceptFirst(cond),
-            listOf(Line(parentFormat.regularIndent, "then")),
-            thenBody,
-            listOf(Line(parentFormat.regularIndent, "else")),
-            elseBody
-        ).flatten()
-    }
+    private val makeFullMultiLineOutput: (Format) -> (Triple<List<Line>, List<Line>, List<Line>>) -> List<Line>
+        get() = { format -> { childContents ->
+            println("makeFullMultiLineOutput")
+            val firstConditionLine = listOf(
+                Line(format.regularIndent, firstLineMultiLineCondition(
+                    childContents.first.first().content)
+                ))
+            val otherConditionLines = separateFirstLine(childContents.first).second
+            val thenLine = listOf(Line(format.regularIndent, multiLineThenToken()))
+            val thenBranch = childContents.second
+            val elseLine = listOf(Line(format.regularIndent, multiLineElseToken()))
+            val elseBranch = childContents.third
 
-    private fun fitsSingleLine(parentFormat: Format, cond: Pair<LineMode, List<Line>>, trueBranch: Pair<LineMode, List<Line>>,
-                               falseBranch: Pair<LineMode, List<Line>>): Boolean {
-        return cond.first == LineMode.SINGLE
-                && trueBranch.first == LineMode.SINGLE
-                && falseBranch.first == LineMode.SINGLE
-                && parentFormat.firstLineReservedIndent * config.indentSize + parentFormat.firstLineReservedChars + "if ${cond.second.first().content} then ${trueBranch.second.first().content} else ${falseBranch.second.first().content}".length <= config.lineWrap
-    }
+            firstConditionLine+ otherConditionLines + thenLine + thenBranch + elseLine + elseBranch
+        }}
 
-    private fun fitsSingleLine(parentFormat: Format, cond: Pair<LineMode, List<Line>>): Boolean {
-        return cond.first == LineMode.SINGLE
-                && parentFormat.firstLineReservedIndent * config.indentSize + parentFormat.firstLineReservedChars + "if ${cond.second.first().content} then".length <= config.lineWrap
-    }
+    private val enrichSingleLineFormat: (Format) -> Format
+        get() = { format ->
+            format.copy(
+                continuesFirstLine = true,
+                firstLineReservedChars =+ firstLineSingleLineCondition("").length,
+                regularIndent = format.regularIndent + 1
+            )
+        }
+
+    private val enrichCondMultiLineFormat: (Format) -> Format
+        get() = { format ->
+            format.copy(
+                continuesFirstLine = true,
+                firstLineReservedChars =+ firstLineMultiLineCondition("").length,
+                regularIndent = format.regularIndent + 1
+            )
+        }
+
+    private val enrichBranchMultiLineFormat: (Format) -> Format
+        get() = { format ->
+            format.copy(
+                continuesFirstLine = false,
+                firstLineReservedChars = 0,
+                firstLineReservedIndent = 0,
+                regularIndent = format.regularIndent + 1
+            )
+        }
+
+    private val printsAllInSingleLine: (Format) -> (Triple<Pair<LineMode, List<Line>>, Pair<LineMode, List<Line>>, Pair<LineMode, List<Line>>>) -> Boolean
+        get() = { format -> { childContent ->
+            val parsedToLine = singleLineFullConditional(Triple(
+                childContent.first.second.first().content,
+                childContent.second.second.first().content,
+                childContent.third.second.first().content
+            ))
+            val occupiedChar = if (format.continuesFirstLine) {
+                config.lineWrap - calcRemainingUnoccupiedChars(format)
+            } else {
+                calcIndentSpace(format.regularIndent)
+            }
+
+            childContent.first.first == LineMode.SINGLE
+                    && childContent.second.first == LineMode.SINGLE
+                    && childContent.third.first == LineMode.SINGLE
+                    && fitsLine(occupiedChar) (parsedToLine)
+        }}
+
+    private val printsCondInSingleLine: (Format) -> (Pair<LineMode, List<Line>>) -> Boolean
+        get() = { format -> { condition ->
+            condition.first == LineMode.SINGLE
+                    && fitsLine(calcIndentSpace(format.regularIndent)) (condition.second.first().content)
+        }}
+
+    private val fitsLine: (Int) -> (String) -> Boolean
+        get() = { occupied -> { condition ->
+            condition.length + occupied <= config.lineWrap
+        }}
+
+    private val singleLineFullConditional: (Triple<String, String, String>) -> String
+        get() = { triple ->
+            "if ${triple.first} then ${triple.second} else ${triple.third}"
+        }
+
+    private val firstLineSingleLineCondition: (String) -> String
+        get() = { condition ->
+            "if $condition then"
+        }
+
+    private val firstLineMultiLineCondition: (String) -> String
+        get() = { condition ->
+            "if $condition"
+        }
+
+    private val multiLineElseToken: () -> String
+        get() = { "else" }
+
+    private val multiLineThenToken: () -> String
+        get() = { "then" }
 }
