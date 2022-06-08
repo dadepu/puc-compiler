@@ -53,7 +53,7 @@ data class Lambda(
                 listOf((getFirstLine andThen sameLineOutput(parentSingleFormat)) (childContent.second)
                 )
             )
-        } else if (childShouldContinueLine()) { // TODO(must validate if it fits !!)
+        } else if (childShouldContinueLine()) { // TODO(must validate if it fits !! && print in line is allowed by parent format)
             Pair(
                 LineMode.MULTI,
                 (separateFirstLine andThen sameLineMultiLineOutput(parentSingleFormat)) (childContent.second)
