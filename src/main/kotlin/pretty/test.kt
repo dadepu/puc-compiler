@@ -1,46 +1,52 @@
 package pretty
 
-import Lexer
-import Parser
-import pretty.functions.parseExpr
-import pretty.functions.parseIndent
+
+/*
+    let a = 3 + 3 in
+    let b = \x -> if x == 2 then 5 else 10 in
+    let c = \x ->
+        if x == 2 then
+            \y -> 3
+        else
+            \y -> 2 in
+
+    let d = \format -> \lines -> \continuesInSameLine -> \isMultiLine ->
+        \any -> \anymore ->
+            let add = \one -> \two -> \three ->
+                one + two + three in
+            if true then
+                \x -> \y -> x + y
+            else
+                \x -> \y -> x * y in
+    3
+ */
+
+/*
+    # Parent-let breaks line before child-condition does.
+
+        Recreate:   (1) 'let b = if 3 + 3 + 3 + 3 + 3 + 3 + 3 == 9 then 3 else 2 in'
+
+                    (2) 'let d = if 3 + 3 + 3 + 3 + 3 + 3 + 3 + 3 + 3 + 3 + 3 + 3 + 3 + 3 == 9 then 3 else 2 in'
+
+ */
+
 
 fun main() {
-    val one = "if 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 == 16 then 3 + 3 + 3 + 3 + 3 + 3 else 2 + 2 + 2 + 2 + 2"
-
-    val two = "\\y -> \\x -> x + 1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9 + 10 + 11 + 12"
 
     testInput("""
-        let x = \x -> 3 + 3 + 3 + 3 + 3 + 3 + 3 + 3 + 3 + 3 + 3 in
-        let y = \y -> 2 + 2 in
-        let z = \z -> 
-            let i = 3 in
-            z + i in
-        3
+        let a = if true then 1 else 2 in
+        
+        let b = if 3 + 3 + 3 + 3 + 3 + 3 + 3 == 9 then 3 else 2 in
+        
+        let c = if 3 + 3 + 3 + 3 + 3 == 9 then 3 + 3 + 3 else 2 in
+        
+        let d = if 3 + 3 + 3 + 3 + 3 + 3 + 3 + 3 + 3 + 3 + 3 + 3 + 3 + 3 == 9 then 3 else 2 in
+        
+        1
     """.trimIndent())
 }
 
 private fun testInput(input: String) {
-    val parser = Parser(Lexer(input))
-    val expr = parser.parseExpression()
-//    println(expr)
-    parseExpr(expr).generateOutput { _ -> Format(true) }
-        .second
-        .forEach { println( parseIndent(it.indent) + it.content)}
+    val printer = PrettyPrinter()
+    printer.format({ input }, { s -> println(s) })
 }
-
-
-
-/*
-    TODO:
-        App
-        Binary-Types: App
-        Check: Different multiline conditions may cause bugs
-        Refactor Output: Lambda, LetBinding
-        Config: Linebreak (Lambda, Let, If), Indentations
-        Multiline include indentations
-        Linebreak Binaries
-        Verify flatLength works as expected
-        Single-Line Comments
-        Multi-Line Comments
- */
