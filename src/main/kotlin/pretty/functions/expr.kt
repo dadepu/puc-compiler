@@ -63,13 +63,11 @@ val calcIndentSpace: (Int) -> Int
  */
 val enrichFormat: (Pair<(Format) -> Format, (Format) -> Format>) -> ((LineMode) -> Format) -> ((LineMode) -> Format)
     get() = { transform -> { f -> { mode ->
-                when (mode) {
-                    LineMode.SINGLE -> transform.first(f(LineMode.SINGLE))
-                    LineMode.MULTI -> transform.second(f(LineMode.MULTI))
-                }
-            }
+        when (mode) {
+            LineMode.SINGLE -> transform.first(f(LineMode.SINGLE))
+            LineMode.MULTI -> transform.second(f(LineMode.MULTI))
         }
-    }
+    }}}
 
 /*
     Calculates based on the passed format how many unoccupied characters remain in the line.
