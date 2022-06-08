@@ -5,6 +5,32 @@ import pretty.*
 import pretty.functions.*
 import pretty.utilities.config
 
+
+/*
+    A conditional has three different print modes.
+
+    (1) A conditional will preferably try to print its contents into a single line.
+
+        Eg.: if ... then ... else ...
+
+    (2) When the line length exceeds all available characters, or when one or both branches are multiline,
+            but the condition is still single line and fits into the first line, then the condition is printed as
+            follows.
+
+        Eg.: if ... then
+                ...
+            else
+                ...
+
+    (3) Otherwise, the condition is spread over multiple lines as well.
+
+        Eg.: if ...
+                ...
+            then
+                ...
+            else
+                ...
+ */
 data class Conditional(
 
     val content: Expr.If
@@ -18,31 +44,6 @@ data class Conditional(
     private val exprFalse: Printable = parseExpr(content.elseBranch)
 
 
-    /*
-        A conditional has three different print modes.
-
-        (1) A conditional will preferably try to print its contents into a single line.
-
-            Eg.: if ... then ... else ...
-
-        (2) When the line length exceeds all available characters, or when one or both branches are multiline,
-                but the condition is still single line and fits into the first line, then the condition is printed as
-                follows.
-
-            Eg.: if ... then
-                    ...
-                else
-                    ...
-
-        (3) Otherwise, the condition is spread over multiple lines as well.
-
-            Eg.: if ...
-                    ...
-                then
-                    ...
-                else
-                    ...
-     */
     override fun generateOutput(f: (LineMode) -> Format): Pair<LineMode, List<Line>> {
         val firstLineIndent = f(LineMode.SINGLE).firstLineReservedIndent
         val firstLineChars = f(LineMode.SINGLE).firstLineReservedChars + "if  then  else ".length

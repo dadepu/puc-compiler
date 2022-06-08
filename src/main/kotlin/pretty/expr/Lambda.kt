@@ -9,6 +9,27 @@ import pretty.Printable
 import pretty.functions.*
 import pretty.utilities.config
 
+
+/*
+    (1) A Lambda will preferably print its children in the same line:
+
+    Eg.: ( \x -> 3 + ... )
+
+    (2) If the children's content spans multiple lines, distinctions are made regarding the
+        children's type. If the children is a lambda as well, an attempt is made to output at
+        least its binder in the same line:
+
+    Eg.: ( \x -> ( \y ->
+            ...) )
+
+    (3) If that isn't possible, the output continues in the next line:
+
+    Eg.: ( \x ->
+            ...
+            ... )
+
+    Therefore, three different output formats exist for a lambda expression.
+ */
 data class Lambda(
 
     val content: Expr.Lambda
@@ -19,27 +40,6 @@ data class Lambda(
 
     private val exprBody: Printable = parseExpr(content.body)
 
-
-    /*
-        (1) A Lambda will preferably print its children in the same line:
-
-        Eg.: ( \x -> 3 + ... )
-
-        (2) If the children's content spans multiple lines, distinctions are made regarding the
-            children's type. If the children is a lambda as well, an attempt is made to output at
-            least its binder in the same line:
-
-        Eg.: ( \x -> ( \y ->
-                ...) )
-
-        (3) If that isn't possible, the output continues in the next line:
-
-        Eg.: ( \x ->
-                ...
-                ... )
-
-        Therefore, three different output formats exist for a lambda expression.
-     */
     override fun generateOutput(f: (LineMode) -> Format): Pair<LineMode, List<Line>> {
         val parentSingleFormat = f(LineMode.SINGLE)
         val parentMultiFormat = f(LineMode.MULTI)
