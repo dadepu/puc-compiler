@@ -2,31 +2,29 @@ package pretty
 
 import Lexer
 import Parser
+import pretty.functions.parseExpr
+import pretty.functions.parseIndent
 
 fun main() {
+    val one = "if 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 == 16 then 3 + 3 + 3 + 3 + 3 + 3 else 2 + 2 + 2 + 2 + 2"
+
+//    \x -> \y -> x + y + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2
+
     testInput("""
-        let x = \x -> x + 3 +3+3+3+3+3+3 +3 in
-        2
+        \y -> \x -> x + 1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9 + 10 + 11 + 12
     """.trimIndent())
 }
 
-/*
-        BUG: flatLength should only consider the length of the first line. the output should not be compressed.
-            Hence, the name flatLength is misleading.
-*/
+private fun testInput(input: String) {
+    val parser = Parser(Lexer(input))
+    val expr = parser.parseExpression()
+//    println(expr)
+    parseExpr(expr).generateOutput { _ -> Format(true) }
+        .second
+        .forEach { println( parseIndent(it.indent) + it.content)}
+}
 
-/*
-        Output should take an argument indicating how many empty spaces are leading the first character.
-*/
 
-/*
-    APP
-    (1)     (func) (arg) (arg) ...
-    (2)     (looooooong func) \x->
-                ..... (arg) (arg) ...
-    (3)     (looooooooooooong func)
-                (arg) (arg) ....
- */
 
 /*
     TODO:
@@ -41,26 +39,3 @@ fun main() {
         Single-Line Comments
         Multi-Line Comments
  */
-
-private fun testInput(input: String) {
-    val parser = Parser(Lexer(input))
-    val expr = parser.parseExpression()
-    println(expr)
-    parseExpr(0)(expr).output.forEach { println( parseIndent(it.indent) + it.content)}
-}
-
-private fun testSimpleLambda() {
-    val lambdaExpr = Lambda(0, Expr.Lambda(
-        "x", Expr.Var("x")
-    ))
-    lambdaExpr.output.forEach { println( parseIndent(it.indent) + it.content)}
-}
-
-private fun testSimpleCondition() {
-    val conditionalExpr = Conditional(0, Expr.If(
-        Expr.Binary(Expr.IntLiteral(3), Operator.Equality, Expr.IntLiteral(3)),
-        Expr.IntLiteral(5),
-        Expr.IntLiteral(6)
-    ))
-    conditionalExpr.output.forEach { println( parseIndent(it.indent) + it.content)}
-}
