@@ -16,11 +16,7 @@ data class BoolLiteral(
     override fun generateOutput(f: (LineMode) -> Format): Pair<LineMode, List<Line>> {
         return Pair(
             LineMode.SINGLE,
-            listOf(generateSingleLineOutput(f))
+            listOf(Line(f(LineMode.SINGLE).regularIndent, parseBoolLiteral(content)))
         )
-    }
-
-    private fun generateSingleLineOutput(f: (LineMode) -> Format): Line {
-        return Line(f(LineMode.SINGLE).regularIndent, parseBoolLiteral(content))
     }
 }
