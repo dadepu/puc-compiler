@@ -8,10 +8,15 @@ import pretty.functions.parseIndent
 fun main() {
     val one = "if 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 == 16 then 3 + 3 + 3 + 3 + 3 + 3 else 2 + 2 + 2 + 2 + 2"
 
-//    \x -> \y -> x + y + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2
+    val two = "\\y -> \\x -> x + 1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9 + 10 + 11 + 12"
 
     testInput("""
-        \y -> \x -> x + 1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9 + 10 + 11 + 12
+        let x = \x -> 3 + 3 + 3 + 3 + 3 + 3 + 3 + 3 + 3 + 3 + 3 in
+        let y = \y -> 2 + 2 in
+        let z = \z -> 
+            let i = 3 in
+            z + i in
+        3
     """.trimIndent())
 }
 
