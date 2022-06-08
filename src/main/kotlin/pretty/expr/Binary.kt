@@ -6,6 +6,29 @@ import pretty.*
 import pretty.functions.*
 import pretty.utilities.config
 
+/*
+    Binaries are chained by nesting.
+
+        E.g.: Binary(Binary(Int, Op, Int), Op, Binary(Int, Op, Int))
+
+    Once a Binary is encountered while printing, all embedded binaries are resolved and parsed into
+        strings. Therefore, the top level Binary of a nested set of binaries is responsible for
+        the whole structure.
+
+    There are two possible outputs:
+
+        (1) As single-line:
+
+                E.g.: 3 + 3 + 3
+
+        (2) Over multiple lines:
+
+                E.g.: 3 + 3 + ....
+                        + 3 ...
+                        + ...
+
+            Outputs over multiple lines must always (!) start with an operator.
+ */
 data class Binary(
 
     val content: Expr.Binary
@@ -13,12 +36,21 @@ data class Binary(
 ) : Printable {
 
     override fun generateOutput(f: (LineMode) -> Format): Pair<LineMode, List<Line>> {
-        return if (!isMultiLine(f))
-            Pair(LineMode.SINGLE, listOf(generateSingleLineOutput(f)))
-        else
-            Pair(LineMode.MULTI, generateMultiLineOutput(f))
+        val singleFormat = f(LineMode.SINGLE)
+        val multiFormat = f(LineMode.MULTI)
+        val parsedBinary = parseBinary(content)
+
+        return if (printsInSingleLine(singleFormat) (parsedBinary)) {
+            Pair(LineMode.SINGLE, listOf(generateSingleLineOutput(singleFormat)))
+        } else {
+            Pair(LineMode.MULTI, generateMultiLineOutput(multiFormat))
+        }
     }
 
+    /*
+        Recursively resolves as nested structure of Binaries into a list of strings. A distinction is made
+            between operators and literals.
+     */
     private val parseBinary: (Expr) -> List<Pair<ContentType, String>>
         get() = { expr ->
             when(expr) {
@@ -34,35 +66,70 @@ data class Binary(
             }
         }
 
-    private val mapToString: (List<Pair<ContentType, String>>) -> List<String>
+    /*
+        Outputs into a single line.
+
+            E.g.:   3 + 3 + 3 + 3 + ...
+     */
+    private val generateSingleLineOutput: (Format) -> Line
+        get() = { format ->
+            Line(
+                format.regularIndent,
+                (parseBinary andThen extractStrings andThen parseToString) (content)
+            )
+        }
+
+    /*
+        Outputs over multiple lines.
+
+            E.g.:   ... 3 + 3 + 3
+                        + 3 + 3 ...
+                        + ...
+     */
+    private val generateMultiLineOutput: (Format) -> List<Line>
+        get() = { format ->
+            val indent = format.regularIndent
+            val indexToIndentation: (Int) -> Int = { index -> if (index == 0) indent else indent + 1 }
+
+            formatToLines (listOf()) (parseBinary(content)) (format)
+                .mapIndexed { index, s -> Line(indexToIndentation(index), s) }
+        }
+
+    /*
+        Checks if it's possible to print the whole binary structure into a single line given the
+            already occupied characters by parents.
+     */
+    private val printsInSingleLine: (Format) -> (List<Pair<ContentType, String>>) -> Boolean
+        get() = { format -> { parsedBinary ->
+            val parsed = (extractStrings andThen parseToString)(parsedBinary)
+            fitsFirstLine(Pair(format, parsed))
+        }}
+
+    private val fitsFirstLine: (Pair<Format, String>) -> Boolean
+        get() = { pair ->
+            pair.second.length <= calcRemainingUnoccupiedChars(pair.first)
+        }
+
+    private val parseToString: (List<String>) -> String
+        get() = { x -> x.fold("") { acc, s -> if (acc.isBlank()) s else "$acc $s"} }
+
+    private val extractStrings: (List<Pair<ContentType, String>>) -> List<String>
         get() = { x -> x.map { y -> y.second } }
 
-    private val singleLineLength: Int
-        get() = (parseBinary andThen mapToString andThen parseToString)(content).length
+    /*
+        Recursively formats all elements into a list of formatted lines, respecting the parent's
+            formatting boundaries.
 
-    private fun isMultiLine(f: (LineMode) -> Format): Boolean {
-        val indentLength = f(LineMode.SINGLE).firstLineReservedIndent * config.indentSize
-        val reservedLength = f(LineMode.SINGLE).firstLineReservedChars
-        val remainingLength: (Int) -> Int = { lineLength -> lineLength - indentLength - reservedLength }
-        return singleLineLength > remainingLength(config.lineWrap)
-    }
+        It is assumed, that the very first element on the first call of this function is an indent.
+            After that, operators and indents must be alternately in order.
 
-    private fun generateSingleLineOutput(f: (LineMode) -> Format): Line {
-        return Line(f(LineMode.SINGLE).regularIndent, (parseBinary andThen mapToString andThen parseToString)(content))
-    }
+            E.g.:   3 + 2 == 4 + 1
 
-    private fun generateMultiLineOutput(f: (LineMode) -> Format): List<Line> {
-        val indent = f(LineMode.MULTI).regularIndent
-        val indexToIndentation: (Int) -> Int = { index -> if (index == 0) indent else indent + 1 }
-        return formatToLines (listOf()) (parseBinary(content)) (f(LineMode.MULTI))
-            .mapIndexed { index, s -> Line(indexToIndentation(index), s) }
-    }
+        When the output exceeds a single line, the consecutive line starts with an operator.
 
-    private enum class ContentType {
-        OP,
-        LIT
-    }
-
+            E.g.:   3 + 3 + ...
+                    + 3 + 3 ...
+     */
     private val formatToLines: (List<String>) -> (List<Pair<ContentType, String>>) -> (Format) -> List<String>
         get() = { output -> { remaining -> { format ->
             if (remaining.isEmpty()) {
@@ -80,31 +147,48 @@ data class Binary(
             }
         }}}
 
+    /*
+        Appends an operator and an indent to the last line in a given list of lines. If the
+            line size is exceeded, a new line is started leading by an operator.
+
+            E.g.:   3 + 3 + ...
+                    + 3 ...
+     */
     private val appendContent: (List<String>) -> (String) -> (String) -> (Format) -> List<String>
         get() = { existingContent -> { op -> { lit -> { format ->
             val lastLine = existingContent.last()
-            val fitsInLastLine = fitsLine(existingContent.size - 1) ("$lastLine $op $lit") (format)
-            if (fitsInLastLine) {
+            val fitsLastLine = fitsLine(existingContent.size - 1) ("$lastLine $op $lit") (format)
+
+            if (fitsLastLine) {
                 existingContent.dropLast(1) + listOf("$lastLine $op $lit")
             } else {
                 existingContent + listOf("$op $lit")
             }
         }}}}
 
+    /*
+        Validates if the concatenated string is below the maximum allowed size in length.
+        Occupied characters by parents are taken into consideration.
+     */
     private val fitsLine: (Int) -> (String) -> (Format) -> Boolean
-        get() = { index -> { appendedString -> { format ->
-            config.lineWrap - occupiedChar(index) (format) > appendedString.length
+        get() = { lineIndex -> { appendedString -> { format ->
+            config.lineWrap - occupiedCharsInLine(lineIndex) (format) > appendedString.length
         }}}
 
-    private val occupiedChar: (Int) -> (Format) -> Int
+    /*
+        Calculates the amount of occupied characters for a line.
+     */
+    private val occupiedCharsInLine: (Int) -> (Format) -> Int
         get() = { lineIndex -> { format ->
             if (lineIndex == 0) {
-                format.firstLineReservedIndent * config.indentSize + format.firstLineReservedChars
+                calcIndentSpace(format.firstLineReservedIndent) + format.firstLineReservedChars
             } else {
-                format.regularIndent * config.indentSize
+                calcIndentSpace(format.regularIndent)
             }
         }}
 
-    private val parseToString: (List<String>) -> String
-        get() = { x -> x.fold("") { acc, s -> if (acc.isBlank()) s else "$acc $s"} }
+    private enum class ContentType {
+        OP,
+        LIT
+    }
 }
