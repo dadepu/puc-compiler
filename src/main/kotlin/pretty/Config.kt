@@ -4,7 +4,7 @@ data class Config(
     /*
         Specifies how many whitespaces make up an indentation.
      */
-    val indentSize: Int = 4,
+    val indentSize: Int = 2,
 
     /*
         Specifies at which point lines are to be wrapped. Including indentations.
@@ -15,7 +15,7 @@ data class Config(
         Lambda-specific Configurations.
      */
     val lambda: LambdaConfig = LambdaConfig(
-        wrappedInParentheses = true
+        wrappedInParentheses = false
     )
 
 ) {
@@ -30,6 +30,6 @@ data class Config(
         /*
             Specifies the connection arrow for lambdas.
          */
-        val connectionArrow: String = "->"
+        val connectionArrow: String = "=>"
     )
 }
