@@ -176,12 +176,18 @@ data class Binary(
         }}}
 
     /*
-        Calculates the amount of occupied characters for a line.
+        Calculates how many characters for a given line-index are already occupied by parents.
+
+        Occupied characters may only exist in the first line.
      */
     private val occupiedCharsInLine: (Int) -> (Format) -> Int
         get() = { lineIndex -> { format ->
             if (lineIndex == 0) {
-                calcIndentSpace(format.firstLineReservedIndent) + format.firstLineReservedChars
+                if (format.continuesFirstLine) {
+                    calcIndentSpace(format.firstLineReservedIndent) + format.firstLineReservedChars
+                } else {
+                    calcIndentSpace(format.regularIndent)
+                }
             } else {
                 calcIndentSpace(format.regularIndent)
             }
