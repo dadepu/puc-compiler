@@ -24,7 +24,7 @@ import pretty.functions.*
 
     A Let is always multi-line in nature and must always start in a new line. Therefore, the parent's continuesFirstLine
         configuration is ignored. It follows, that the parent must also recognize, that Lets can not be printed
-        in the same line.
+        in the same line. That is especially important for lambda-parents.
 
         E.g.: NOT:  \x -> let z = 3 in
                         x + z
@@ -36,7 +36,7 @@ import pretty.functions.*
 
     The Let's body tails its expression and follows after the 'in'-token in the next line.
 
-        E.g.:    let z = 3 in
+        E.g.:   let z = 3 in
                 3 + z
 
     Because of that, the format used to output the body must inherit the let's indentation but must also
@@ -56,10 +56,16 @@ data class LetBinding(
     private val exprBody: Printable = parseExpr(content.body)
 
 
+    /*
+        Concatenates expression- and body output.
+     */
     override fun generateOutput(f: (LineMode) -> Format): Pair<LineMode, List<Line>> {
         return Pair(LineMode.MULTI ,exprOutput(f) + bodyOutput(f))
     }
 
+    /*
+        Outputs the expression with the updated expression-formats.
+     */
     private val exprOutput: ((LineMode) -> Format) -> List<Line>
         get() = { parentFormats ->
             val multiFormat = parentFormats(LineMode.MULTI)
@@ -75,6 +81,9 @@ data class LetBinding(
             }
         }
 
+    /*
+        Outputs the body with the updated body-formats.
+     */
     private val bodyOutput: ((LineMode) -> Format) -> List<Line>
         get() = { parentFormats ->
             val childBody = exprBody.generateOutput(
@@ -83,18 +92,35 @@ data class LetBinding(
             childBody.second
         }
 
+    /*
+        Appends the child's output to the first line over multiple lines.
+
+        E.g.:   let x = ...
+                    ...
+     */
     private val sameLineMultiLineOutput: (Format) -> (Pair<Line, List<Line>>) -> List<Line>
         get() = { format -> { pair ->
             val exprLines = listOf(Line(format.regularIndent, firstLineContent(pair.first.content))) + pair.second
             appendTokenToLastLine(" in") (exprLines)
         }}
 
+    /*
+        Appends the child's output to the next line following the lambda token.
+
+        E.g.:   let x =
+                    ...
+     */
     private val nextLineMultiLineOutput: (Format) -> (List<Line>) -> List<Line>
         get() = { format -> { lines ->
             val exprLines = listOf(Line(format.regularIndent, firstLineContent(null))) + lines
             appendTokenToLastLine(" in") (exprLines)
         }}
 
+    /*
+        Enriches the parent's single line format for expressions.
+
+        Expressions should always continue in the same line.
+     */
     private val enrichSingleExprFormat: (Format) -> Format
         get() = { format ->
             format.copy(
@@ -104,6 +130,16 @@ data class LetBinding(
             )
         }
 
+    /*
+        Enriches the parent's multi line format for expressions.
+
+        Expressions over multiple lines should continue in the first line. Following lines
+            must have an indentation incremented by 1.
+
+            E.g.:   let addMultiple = 3 + 3 + ...
+                        + 3 + 3
+                        ...
+     */
     private val enrichMultiExprFormat: (Format) -> Format
         get() = { format ->
             format.copy(
@@ -113,6 +149,12 @@ data class LetBinding(
             )
         }
 
+    /*
+        Enriches the parent's single line format for the body.
+
+        The body tails the let expression and should therefore start in a new line and have the
+            same indentation as the let-token.
+     */
     private val enrichSingleBodyFormat: (Format) -> Format
         get() = { format ->
             format.copy(
@@ -122,6 +164,9 @@ data class LetBinding(
             )
         }
 
+    /*
+        Same as above.
+     */
     private val enrichMultiBodyFormat: (Format) -> Format
         get() = { format ->
             format.copy(
