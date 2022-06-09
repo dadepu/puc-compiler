@@ -101,7 +101,7 @@ data class LetBinding(
     private val sameLineMultiLineOutput: (Format) -> (Pair<Line, List<Line>>) -> List<Line>
         get() = { format -> { pair ->
             val exprLines = listOf(Line(format.regularIndent, firstLineContent(pair.first.content))) + pair.second
-            appendTokenToLastLine(" in") (exprLines)
+            appendInToken(format.regularIndent) (exprLines)
         }}
 
     /*
@@ -113,7 +113,19 @@ data class LetBinding(
     private val nextLineMultiLineOutput: (Format) -> (List<Line>) -> List<Line>
         get() = { format -> { lines ->
             val exprLines = listOf(Line(format.regularIndent, firstLineContent(null))) + lines
-            appendTokenToLastLine(" in") (exprLines)
+            appendInToken(format.regularIndent) (exprLines)
+        }}
+
+    /*
+
+     */
+    private val appendInToken: (Int) -> (List<Line>) -> List<Line>
+        get() = { indent -> { lines ->
+            if (lines.size == 1) {
+                appendTokenToLastLine(" in") (lines)
+            } else {
+                lines + listOf(Line(indent, "in"))
+            }
         }}
 
     /*
@@ -125,7 +137,7 @@ data class LetBinding(
         get() = { format ->
             format.copy(
                 continuesFirstLine = true,
-                firstLineReservedChars = format.firstLineReservedChars + firstLineContent(null).length,
+                firstLineReservedChars = format.firstLineReservedChars + firstLineContent(null).length + 3,
                 regularIndent = format.regularIndent + 1
             )
         }
@@ -183,7 +195,7 @@ data class LetBinding(
 
     private val firstLineContent: (String?) -> String
         get() = { s ->
-            val content = if (s == null) "" else " $s"
-            "let $exprBinder =$content"
+            val content = if (s == null) "" else "$s"
+            "let $exprBinder = $content"
         }
 }
