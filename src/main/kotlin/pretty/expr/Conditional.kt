@@ -173,18 +173,6 @@ data class Conditional(
                     && fitsLine(occupiedChar) (parsedToLine)
         }}
 
-    /*
-        if continue line
-            -> validate minimum space && fits
-        else
-            -> fits w/o occupied char
-
-        if continue line
-            -> format
-
-        if below breaking point
-            -> format?
-     */
     private val printsCondInSingleLine: (Format) -> (Pair<LineMode, List<Line>>) -> Boolean
         get() = { format -> { condition ->
             condition.first == LineMode.SINGLE
