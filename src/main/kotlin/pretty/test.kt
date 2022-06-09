@@ -25,9 +25,35 @@ package pretty
 
 fun main() {
 
-    testInput("""
-        let d = if 3 + 3 + 3 + 3 + 3 + 3 + 3 + 3 + 3 + 3 + 3 + 3 + 3 + 3 == 9 then 3 else 2 in
-        1
+    /*
+        let add = \firstNumber => \secondNumber => \thirdNumber =>
+            \fourthNumber =>
+                firstNumber + secondNumber + thirdNumber + fourthNumber
+        in
+
+     let add = \firstNumber -> \secondNumber -> \thirdNumber -> \fourthNumber -> firstNumber + secondNumber + thirdNumber + fourthNumber in
+        3
+
+if a == cond then
+                add
+            else
+                sub
+
+    3
+
+
+     */
+    testInput("""     
+        let a = \a -> \b ->
+            let add = \x -> \y -> x + y in
+            let sub = \x -> \y -> x - y in
+            let condition = 3 + 3 == 6 in
+            if condition then
+                add
+            else
+                sub
+            in
+        3
     """.trimIndent())
 }
 

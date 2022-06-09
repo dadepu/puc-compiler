@@ -120,11 +120,11 @@ data class LetBinding(
 
      */
     private val appendInToken: (Int) -> (List<Line>) -> List<Line>
-        get() = { indent -> { lines ->
+        get() = { letIndent -> { lines ->
             if (lines.size == 1) {
                 appendTokenToLastLine(" in") (lines)
             } else {
-                lines + listOf(Line(indent, "in"))
+                lines + listOf(Line(letIndent + 1, "in"))
             }
         }}
 
@@ -172,7 +172,8 @@ data class LetBinding(
             format.copy(
                 continuesFirstLine = false,
                 firstLineReservedIndent = 0,
-                firstLineReservedChars = 0
+                firstLineReservedChars = 0,
+                regularIndent = format.regularIndent
             )
         }
 
@@ -184,7 +185,8 @@ data class LetBinding(
             format.copy(
                 continuesFirstLine = false,
                 firstLineReservedIndent = 0,
-                firstLineReservedChars = 0
+                firstLineReservedChars = 0,
+                regularIndent = format.regularIndent
             )
         }
 

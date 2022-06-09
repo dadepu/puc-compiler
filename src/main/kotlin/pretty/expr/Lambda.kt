@@ -43,7 +43,7 @@ data class Lambda(
     override fun generateOutput(f: (LineMode) -> Format): Pair<LineMode, List<Line>> {
         val parentSingleFormat = f(LineMode.SINGLE)
         val parentMultiFormat = f(LineMode.MULTI)
-        val newSingleFormat = enrichSingleFormat
+        val newSingleFormat = chooseSingleLineFormat(content.body)
         val newMultiFormat = chooseMultiLineFormat(content.body)
         val childContent = exprBody.generateOutput(enrichFormat(Pair(newSingleFormat, newMultiFormat)) (f))
 
@@ -111,6 +111,15 @@ data class Lambda(
         For example, a child-lambda should continue in the same line with its binding, whereas a binary or conditional
             should always continue in the next consecutive line.
      */
+    private val chooseSingleLineFormat: (Expr) -> (Format) -> Format
+        get() = { expr -> { parentSingleFormat ->
+            when (expr) {
+                is Expr.Lambda -> enrichSingleFormatContinued(parentSingleFormat)
+                else -> enrichSingleFormat(parentSingleFormat)
+            }
+        }}
+
+
     private val chooseMultiLineFormat: (Expr) -> (Format) -> Format
         get() = { expr -> { parentMultiFormat ->
             when(expr) {
@@ -129,6 +138,16 @@ data class Lambda(
             format.copy(
                 continuesFirstLine = true,
                 firstLineReservedChars = format.firstLineReservedChars + mergeFirstLineContent("").length,
+                regularIndent = format.regularIndent + 1
+            )
+        }
+
+    private val enrichSingleFormatContinued: (Format) -> Format
+        get() = { format ->
+            format.copy(
+                continuesFirstLine = true,
+                firstLineReservedChars = format.firstLineReservedChars + mergeFirstLineContent("").length,
+                regularIndent = format.regularIndent
             )
         }
 

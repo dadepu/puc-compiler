@@ -112,7 +112,8 @@ data class Conditional(
                 continuesFirstLine = true,
                 firstLineReservedChars = format.firstLineReservedChars + singleLineFullConditional(
                     Triple("", "", "")
-                ).length
+                ).length,
+                regularIndent = format.regularIndent + 1
             )
         }
 
@@ -132,14 +133,14 @@ data class Conditional(
                 format.copy(
                     continuesFirstLine = true,
                     firstLineReservedChars = format.firstLineReservedChars + firstLineMultiLineCondition("").length,
-                    regularIndent = format.regularIndent
+                    regularIndent = format.regularIndent + 1
                 )
             } else {
                 format.copy(
                     continuesFirstLine = true,
                     firstLineReservedIndent = format.regularIndent,
                     firstLineReservedChars = firstLineMultiLineCondition("").length,
-                    regularIndent = format.regularIndent + 1
+                    regularIndent = format.regularIndent
                 )
             }
         }
