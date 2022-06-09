@@ -4,12 +4,12 @@ data class Config(
     /*
         Specifies how many whitespaces make up an indentation.
      */
-    val indentSize: Int = 2,
+    val indentSize: Int = 4,
 
     /*
         Specifies at which point lines are to be wrapped. Including indentations.
      */
-    val lineWrap: Int = 50,
+    val lineWrap: Int = 80,
 
     /*
         Lambda-specific Configurations.
