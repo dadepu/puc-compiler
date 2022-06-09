@@ -43,7 +43,7 @@ val parseVariable: (Expr.Var) -> String
     get() = { x -> x.name }
 
 val parseIndent: (Int) -> String
-    get() = { x -> IntRange(0, (x * 2) - 1).fold("") { acc, _ -> "$acc " } }
+    get() = { x -> IntRange(0, (x * config.indentSize) - 1).fold("") { acc, _ -> "$acc " } }
 
 val separateFirstLine: (List<Line>) -> Pair<Line, List<Line>>
     get() = { lines ->
