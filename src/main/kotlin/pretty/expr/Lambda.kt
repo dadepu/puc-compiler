@@ -43,8 +43,8 @@ data class Lambda(
     override fun generateOutput(f: (LineMode) -> Format): Pair<LineMode, List<Line>> {
         val parentSingleFormat = f(LineMode.SINGLE)
         val parentMultiFormat = f(LineMode.MULTI)
-        val newSingleFormat: (Format) -> Format = enrichSingleFormat
-        val newMultiFormat: (Format) -> Format = chooseMultiLineFormat(parentMultiFormat) (childShouldContinueLine) (Pair(enrichMultiFormatContinued, enrichMultiFormat))
+        val newSingleFormat = enrichSingleFormat
+        val newMultiFormat = chooseMultiLineFormat(content.body)
         val childContent = exprBody.generateOutput(enrichFormat(Pair(newSingleFormat, newMultiFormat)) (f))
 
         return if (printsInSingleLine(parentSingleFormat) (childContent)) {
@@ -52,11 +52,6 @@ data class Lambda(
                 LineMode.SINGLE,
                 listOf((getFirstLine andThen sameLineOutput(parentSingleFormat)) (childContent.second)
                 )
-            )
-        } else if (childShouldContinueLine()) { // TODO(must validate if it fits !! && print in line is allowed by parent format)
-            Pair(
-                LineMode.MULTI,
-                (separateFirstLine andThen sameLineMultiLineOutput(parentSingleFormat)) (childContent.second)
             )
         } else {
             Pair(
@@ -108,6 +103,7 @@ data class Lambda(
 
 
     /*
+        TODO
         Chooses which multiline format should be selected.
         There are two types of multiline formats. One which continues in the same line and the other which continues in
             the consecutive line. The decision is made based on the parent's format and the child's expression-type.
@@ -115,16 +111,13 @@ data class Lambda(
         For example, a child-lambda should continue in the same line with its binding, whereas a binary or conditional
             should always continue in the next consecutive line.
      */
-    private val chooseMultiLineFormat: (Format) -> (() -> Boolean) -> (Pair<(Format) -> Format, (Format) -> Format>) -> ((Format) -> Format)
-        get() = { parentFormat -> { continueLine -> { formats ->
-            val continueFormat = formats.first
-            val notContinueFormat = formats.second
-            if (!parentFormat.continuesFirstLine) {
-                notContinueFormat
-            } else {
-                if (continueLine()) continueFormat else notContinueFormat
+    private val chooseMultiLineFormat: (Expr) -> (Format) -> Format
+        get() = { expr -> { parentMultiFormat ->
+            when(expr) {
+                is Expr.Lambda -> enrichMultiFormatContinued(parentMultiFormat)
+                else -> enrichMultiFormat(parentMultiFormat)
             }
-        }}}
+        }}
 
     /*
         Extends the received parent's single line format.
@@ -147,9 +140,10 @@ data class Lambda(
     private val enrichMultiFormatContinued: (Format) -> Format
         get() = { format ->
             format.copy(
-                continuesFirstLine = true,
-                firstLineReservedChars = format.firstLineReservedChars + mergeFirstLineContent("").length,
-                regularIndent = format.regularIndent + 1
+                continuesFirstLine = false,
+                firstLineReservedIndent = 0,
+                firstLineReservedChars = 0,
+                regularIndent = format.regularIndent
             )
         }
 
@@ -161,6 +155,7 @@ data class Lambda(
         get() = { format ->
             format.copy(
                 continuesFirstLine = false,
+                firstLineReservedIndent = 0,
                 firstLineReservedChars = 0,
                 regularIndent = format.regularIndent + 1
             )
