@@ -15,6 +15,7 @@ data class App(
     override fun generateOutput(f: (LineMode) -> Format): Pair<LineMode, List<Line>> {
         TODO("Not yet implemented")
     }
+}
 
     //    override val flatLength: Int
 //        get() = flattenOutput(firstLine)(singleLineOutput).length
@@ -46,4 +47,3 @@ data class App(
 //    //     \x -> 3 + 3
 //    private val multiLineOutput: List<Line>
 //        get() = TODO()
-}

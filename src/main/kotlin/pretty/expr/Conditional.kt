@@ -43,13 +43,16 @@ data class Conditional(
 
     private val exprFalse: Printable = parseExpr(content.elseBranch)
 
+    private val minimumCharBreakingPoint: Int
+        get() = firstLineSingleLineCondition("").length + 5
+
 
     override fun generateOutput(f: (LineMode) -> Format): Pair<LineMode, List<Line>> {
         val parentSingleFormat = f(LineMode.SINGLE)
         val parentMultiFormat = f(LineMode.MULTI)
 
         val updatedCondFormats = enrichFormat(Pair(enrichSingleLineFormat, enrichCondMultiLineFormat)) (f)
-        val updatedBranchFormats = enrichFormat(Pair(enrichSingleLineFormat, enrichBranchMultiLineFormat)) (f)
+        val updatedBranchFormats = enrichFormat(Pair(enrichBranchSingleLineFormat, enrichBranchMultiLineFormat)) (f)
 
         val cond = exprCond.generateOutput(updatedCondFormats)
         val trueBranch = exprTrue.generateOutput(updatedBranchFormats)
@@ -59,7 +62,7 @@ data class Conditional(
             Pair(LineMode.SINGLE, makeSingleLineOutput(parentSingleFormat) (
                 Triple(cond.second.first(), trueBranch.second.first(), falseBranch.second.first())
             ))
-        } else if (printsCondInSingleLine(parentSingleFormat) (cond)) {
+        } else if (printsCondInSingleLine(parentMultiFormat) (cond)) {
             Pair(LineMode.MULTI, makeBodyMultiLineOutput(parentMultiFormat) (
                 Triple(cond.second.first(), trueBranch.second, falseBranch.second)
             ))
@@ -72,7 +75,6 @@ data class Conditional(
 
     private val makeSingleLineOutput: (Format) -> (Triple<Line, Line, Line>) -> List<Line>
         get() = { format -> { childContents ->
-            println("makeSingleLineOutput")
             listOf(
                 Line(format.regularIndent, singleLineFullConditional(Triple(
                         childContents.first.content, childContents.second.content, childContents.third.content)
@@ -83,7 +85,6 @@ data class Conditional(
 
     private val makeBodyMultiLineOutput: (Format) -> (Triple<Line, List<Line>, List<Line>>) -> List<Line>
         get() = { format -> { childContents ->
-            println("makeBodyMultiLineOutput")
             val firstLine = listOf(Line(format.regularIndent, firstLineSingleLineCondition(childContents.first.content)))
             val elseLine = listOf(Line(format.regularIndent, multiLineElseToken()))
 
@@ -92,7 +93,6 @@ data class Conditional(
 
     private val makeFullMultiLineOutput: (Format) -> (Triple<List<Line>, List<Line>, List<Line>>) -> List<Line>
         get() = { format -> { childContents ->
-            println("makeFullMultiLineOutput")
             val firstConditionLine = listOf(
                 Line(format.regularIndent, firstLineMultiLineCondition(
                     childContents.first.first().content)
@@ -110,18 +110,38 @@ data class Conditional(
         get() = { format ->
             format.copy(
                 continuesFirstLine = true,
-                firstLineReservedChars =+ firstLineSingleLineCondition("").length,
+                firstLineReservedChars = format.firstLineReservedChars + singleLineFullConditional(
+                    Triple("", "", "")
+                ).length
+            )
+        }
+
+    private val enrichBranchSingleLineFormat: (Format) -> Format
+        get() = { format ->
+            format.copy(
+                continuesFirstLine = false,
+                firstLineReservedIndent = 0,
+                firstLineReservedChars = 0,
                 regularIndent = format.regularIndent + 1
             )
         }
 
     private val enrichCondMultiLineFormat: (Format) -> Format
         get() = { format ->
-            format.copy(
-                continuesFirstLine = true,
-                firstLineReservedChars =+ firstLineMultiLineCondition("").length,
-                regularIndent = format.regularIndent + 1
-            )
+            if (hasMinimumSpaceInFirstLine(format)) {
+                format.copy(
+                    continuesFirstLine = true,
+                    firstLineReservedChars = format.firstLineReservedChars + firstLineMultiLineCondition("").length,
+                    regularIndent = format.regularIndent
+                )
+            } else {
+                format.copy(
+                    continuesFirstLine = true,
+                    firstLineReservedIndent = format.regularIndent,
+                    firstLineReservedChars = firstLineMultiLineCondition("").length,
+                    regularIndent = format.regularIndent + 1
+                )
+            }
         }
 
     private val enrichBranchMultiLineFormat: (Format) -> Format
@@ -153,6 +173,18 @@ data class Conditional(
                     && fitsLine(occupiedChar) (parsedToLine)
         }}
 
+    /*
+        if continue line
+            -> validate minimum space && fits
+        else
+            -> fits w/o occupied char
+
+        if continue line
+            -> format
+
+        if below breaking point
+            -> format?
+     */
     private val printsCondInSingleLine: (Format) -> (Pair<LineMode, List<Line>>) -> Boolean
         get() = { format -> { condition ->
             condition.first == LineMode.SINGLE
@@ -163,6 +195,11 @@ data class Conditional(
         get() = { occupied -> { condition ->
             condition.length + occupied <= config.lineWrap
         }}
+
+    private val hasMinimumSpaceInFirstLine: (Format) -> Boolean
+        get() = { format ->
+            calcRemainingUnoccupiedChars(format) >= minimumCharBreakingPoint
+        }
 
     private val singleLineFullConditional: (Triple<String, String, String>) -> String
         get() = { triple ->
