@@ -10,6 +10,7 @@ class PrettyPrinter {
     fun format(input: () -> String, output: (String) -> Unit) {
         val parser = Parser(Lexer(input()))
         val expr = parser.parseExpression()
+//        println(expr)
 
         parseExpr(expr).generateOutput(rootFormat)
             .second
@@ -18,4 +19,5 @@ class PrettyPrinter {
 
     private val rootFormat: (LineMode) -> Format
         get() = { _ -> Format(continuesFirstLine = false) }
+
 }

@@ -1,59 +1,27 @@
 package pretty
 
-
 /*
-    let a = 3 + 3 in
-    let b = \x -> if x == 2 then 5 else 10 in
-    let c = \x ->
-        if x == 2 then
-            \y -> 3
+   let a = \a -> \b ->
+        let add = \x -> \y -> x + y in
+        let sub = \x -> \y -> x - y in
+        let condition = 3 + 3 == 6 in
+        if condition then
+            add
         else
-            \y -> 2 in
-
-    let d = \format -> \lines -> \continuesInSameLine -> \isMultiLine ->
-        \any -> \anymore ->
-            let add = \one -> \two -> \three ->
-                one + two + three in
-            if true then
-                \x -> \y -> x + y
-            else
-                \x -> \y -> x * y in
+            sub
+        in
     3
  */
-
-
-
 fun main() {
-
-    /*
-        let add = \firstNumber => \secondNumber => \thirdNumber =>
-            \fourthNumber =>
-                firstNumber + secondNumber + thirdNumber + fourthNumber
+    testInput("""      
+        let add = \x -> \y -> \z -> x + y + z in
+        let x = \y ->
+            let mul = \i -> \j -> i * j in
+            mul 1 y
         in
-
-     let add = \firstNumber -> \secondNumber -> \thirdNumber -> \fourthNumber -> firstNumber + secondNumber + thirdNumber + fourthNumber in
-        3
-
-if a == cond then
-                add
-            else
-                sub
-
-    3
-
-
-     */
-    testInput("""     
-        let a = \a -> \b ->
-            let add = \x -> \y -> x + y in
-            let sub = \x -> \y -> x - y in
-            let condition = 3 + 3 == 6 in
-            if condition then
-                add
-            else
-                sub
-            in
-        3
+        x 3
+        
+        
     """.trimIndent())
 }
 

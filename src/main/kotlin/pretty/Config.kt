@@ -9,13 +9,13 @@ data class Config(
     /*
         Specifies at which point lines are to be wrapped. Including indentations.
      */
-    val lineWrap: Int = 80,
+    val lineWrap: Int = 60,
 
     /*
         Lambda-specific Configurations.
      */
     val lambda: LambdaConfig = LambdaConfig(
-        wrappedInParentheses = false
+        wrappedInParentheses = true
     )
 
 ) {

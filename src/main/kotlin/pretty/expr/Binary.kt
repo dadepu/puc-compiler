@@ -50,6 +50,8 @@ data class Binary(
     /*
         Recursively resolves as nested structure of Binaries into a list of strings. A distinction is made
             between operators and literals.
+
+        TODO: add Lambda, App, If
      */
     private val parseBinary: (Expr) -> List<Pair<ContentType, String>>
         get() = { expr ->
@@ -62,6 +64,7 @@ data class Binary(
                     listOf(Pair(ContentType.LIT, parseBoolLiteral(expr)))
                 is Expr.Var         ->
                     listOf(Pair(ContentType.LIT, parseVariable(expr)))
+
                 else -> throw Exception("Found undefined type ${expr.javaClass.simpleName} while parsing binary-bottom.")
             }
         }

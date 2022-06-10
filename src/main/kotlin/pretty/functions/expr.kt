@@ -52,6 +52,14 @@ val separateFirstLine: (List<Line>) -> Pair<Line, List<Line>>
             if (lines.size > 1) lines.subList(1, lines.size) else listOf())
     }
 
+val separateLastLine: (List<Line>) -> Pair<Line, List<Line>>
+    get() = { lines ->
+        Pair(
+            lines.last(),
+            if (lines.size > 1) lines.subList(0, lines.size - 1) else listOf()
+        )
+    }
+
 val getFirstLine: (List<Line>) -> Line
     get() = { lines -> lines.first() }
 
