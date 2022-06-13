@@ -12,6 +12,18 @@ package pretty
         in
     3
  */
+
+val s:String =
+    TODO("""
+        # Implement Christoph's newest version,
+        # Implement Strings,
+        # Add color-codes,
+        # Create unformatted sample-programs,
+        # Presentation,
+        Optional:
+            # Embedded App, -Lambda and -IF
+    """)
+
 fun main() {
     testInput("""      
         let add = \x -> \y -> \z -> x + y + z in

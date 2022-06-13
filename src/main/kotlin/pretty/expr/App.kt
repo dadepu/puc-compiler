@@ -10,6 +10,7 @@ import pretty.functions.*
 import pretty.utilities.config
 
 /*
+
     Possible App occurrences:
 
     # Top Level
@@ -58,6 +59,27 @@ import pretty.utilities.config
                         let b = \i -> \j -> j + \z -> z + 1 (1)
                         b (1) (2)
                 a (3) (4)
+
+
+    There are two ways in which an App can occur: Top Level and Embedded.
+
+    Embedded:
+        The following code will be parsed as follows:
+            \x -> x + 3 2
+
+            Lambda [...] Binary(left: x, op: plus, right: App(
+                func: 3, arg: 2)
+
+        The App is considered embedded, because the binary-printable is responsible for embedding
+            and printing.
+
+    Top-Level:
+        Top-level Apps are not bound to a binary. They can occur alone, after a let-expression or
+            in conditional-branches.
+
+
+    This class implements only the top-level variant.
+
  */
 data class App(
 
@@ -69,9 +91,7 @@ data class App(
 
     private val exprArg: Printable = parseExpr(content.arg)
 
-    /*
-        TODO
-     */
+
     override fun generateOutput(f: (LineMode) -> Format): Pair<LineMode, List<Line>> {
         val func = exprFunc.generateOutput(f)
         val arg = exprArg.generateOutput(formatArgument(func) (f))
@@ -85,7 +105,7 @@ data class App(
      */
     private val formatArgument: (Pair<LineMode, List<Line>>) -> ((LineMode) -> Format) -> ((LineMode) -> Format)
         get() = { func -> { parentFormats ->
-            parentFormats
+            parentFormats // TODO("can be ignored")
         }}
 
     private val appendArgument: ((LineMode) -> Format) -> (Pair<LineMode, List<Line>>) -> (Pair<LineMode, List<Line>>)
@@ -116,7 +136,7 @@ data class App(
         get() = { formats -> { lineIndex -> {funcLine -> { argLine ->
             val occupiedChar = 0
 
-            //TODO
+            //TODO ("calc occupied chars, otherwise line-wraps will be ignored.")
 
             "${funcLine.content} ${argLine.content}".length <= config.lineWrap - occupiedChar
         }}}}

@@ -66,9 +66,6 @@ val getFirstLine: (List<Line>) -> Line
 val calcIndentSpace: (Int) -> Int
     get() = { indents -> indents * config.indentSize }
 
-/*
-    Extends the format-decision-function with updated formats.
- */
 val enrichFormat: (Pair<(Format) -> Format, (Format) -> Format>) -> ((LineMode) -> Format) -> ((LineMode) -> Format)
     get() = { transform -> { f -> { mode ->
         when (mode) {

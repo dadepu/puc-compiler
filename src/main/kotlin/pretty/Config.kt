@@ -7,7 +7,7 @@ data class Config(
     val indentSize: Int = 4,
 
     /*
-        Specifies at which point lines are to be wrapped. Including indentations.
+        Specifies at which point lines are wrapped. Including indentations.
      */
     val lineWrap: Int = 60,
 
@@ -23,12 +23,12 @@ data class Config(
 
         /*
             Specifies wether lambdas are wrapped in parentheses.
-            Eg.: \x -> x + 1, ( \x -> x + 1 )
+            Eg.: \x -> x + 1 or ( \x -> x + 1 )
          */
         val wrappedInParentheses: Boolean,
 
         /*
-            Specifies the connection arrow for lambdas.
+            Specifies the connection arrow.
          */
         val connectionArrow: String = "=>"
     )
