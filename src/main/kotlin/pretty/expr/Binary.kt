@@ -110,7 +110,7 @@ data class Binary(
 
     private val fitsFirstLine: (Pair<Format, String>) -> Boolean
         get() = { pair ->
-            pair.second.length <= calcRemainingUnoccupiedChars(pair.first)
+            removeColor(pair.second).length <= calcRemainingUnoccupiedChars(pair.first)
         }
 
     private val parseToString: (List<String>) -> String
@@ -175,7 +175,7 @@ data class Binary(
      */
     private val fitsLine: (Int) -> (String) -> (Format) -> Boolean
         get() = { lineIndex -> { appendedString -> { format ->
-            config.lineWrap - occupiedCharsInLine(lineIndex) (format) > appendedString.length
+            config.lineWrap - occupiedCharsInLine(lineIndex) (format) > removeColor(appendedString).length
         }}}
 
     /*

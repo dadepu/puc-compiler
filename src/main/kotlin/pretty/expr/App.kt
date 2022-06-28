@@ -138,11 +138,11 @@ data class App(
 
             //TODO ("calc occupied chars, otherwise line-wraps will be ignored.")
 
-            "${funcLine.content} ${argLine.content}".length <= config.lineWrap - occupiedChar
+            removeColor("${funcLine.content} ${argLine.content}").length <= config.lineWrap - occupiedChar
         }}}}
 
     private val wrapInParentheses: (List<Line>) -> List<Line>
         get() = { lines ->
-            (prependTokenToFirstLine("(") andThen appendTokenToLastLine(")")) (lines)
+            (prependTokenToFirstLine(config.colorAppLRParent + "(" + config.colorReset) andThen appendTokenToLastLine(config.colorAppLRParent + ")" + config.colorReset)) (lines)
         }
 }

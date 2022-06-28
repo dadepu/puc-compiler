@@ -137,7 +137,7 @@ data class Lambda(
         get() = { format ->
             format.copy(
                 continuesFirstLine = true,
-                firstLineReservedChars = format.firstLineReservedChars + mergeFirstLineContent("").length,
+                firstLineReservedChars = format.firstLineReservedChars + removeColor(mergeFirstLineContent("")).length,
                 regularIndent = format.regularIndent + 1
             )
         }
@@ -146,7 +146,7 @@ data class Lambda(
         get() = { format ->
             format.copy(
                 continuesFirstLine = true,
-                firstLineReservedChars = format.firstLineReservedChars + mergeFirstLineContent("").length,
+                firstLineReservedChars = format.firstLineReservedChars + removeColor(mergeFirstLineContent("")).length,
                 regularIndent = format.regularIndent
             )
         }
@@ -207,16 +207,16 @@ data class Lambda(
 
     private val fitsInSingleLine: (Pair<Format, Line>) -> Boolean
         get() = { pair ->
-            mergeFirstLineContent(pair.second.content).length <= calcRemainingUnoccupiedChars(pair.first)
+            removeColor(mergeFirstLineContent(pair.second.content)).length <= calcRemainingUnoccupiedChars(pair.first)
         }
 
     private val wrapStringInParentheses: (String) -> String
-        get() = { s -> if (config.lambda.wrappedInParentheses) "( $s )" else s }
+        get() = { s -> if (config.lambda.wrappedInParentheses) config.colorLambdaLRParent + "(" + config.colorReset + " " + s  + " " + config.colorLambdaLRParent + ")" + config.colorReset else s }
 
     private val wrapLinesInParentheses: (List<Line>) -> List<Line>
         get() = { lines ->
             if (config.lambda.wrappedInParentheses) {
-                (prependTokenToFirstLine("( ") andThen appendTokenToLastLine(" )"))(lines)
+                (prependTokenToFirstLine(config.colorLambdaLRParent + "("  + config.colorReset + " ") andThen appendTokenToLastLine(" " + config.colorLambdaLRParent + ")" + config.colorReset))(lines)
             } else {
                 lines
             }
@@ -228,5 +228,8 @@ data class Lambda(
         }
 
     private val mergeContent: (String) -> String
-        get() = { content -> "\\${exprBinder} ${config.lambda.connectionArrow} $content" }
+        get() = { content ->
+            "\\${exprBinder} ${config.lambda.connectionArrow} $content"
+            config.colorLambdaBackslash + "\\" + config.colorReset +  config.colorLambdaBinder + exprBinder + config.colorReset + " " + config.colorLambdaArrow +  config.lambda.connectionArrow + config.colorReset + " "  + content
+        }
 }

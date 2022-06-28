@@ -7,6 +7,7 @@ import pretty.Line
 import pretty.LineMode
 import pretty.Printable
 import pretty.functions.*
+import pretty.utilities.config
 
 
 /*
@@ -122,9 +123,9 @@ data class LetBinding(
     private val appendInToken: (Int) -> (List<Line>) -> List<Line>
         get() = { letIndent -> { lines ->
             if (lines.size == 1) {
-                appendTokenToLastLine(" in") (lines)
+                appendTokenToLastLine(" " + config.colorIn + "in" + config.colorReset) (lines)
             } else {
-                lines + listOf(Line(letIndent + 1, "in"))
+                lines + listOf(Line(letIndent + 1, config.colorIn + "in" + config.colorReset))
             }
         }}
 
@@ -137,7 +138,7 @@ data class LetBinding(
         get() = { format ->
             format.copy(
                 continuesFirstLine = true,
-                firstLineReservedChars = format.firstLineReservedChars + firstLineContent(null).length + 3,
+                firstLineReservedChars = format.firstLineReservedChars + removeColor(firstLineContent(null)).length + 3,
                 regularIndent = format.regularIndent + 1
             )
         }
@@ -156,7 +157,7 @@ data class LetBinding(
         get() = { format ->
             format.copy(
                 continuesFirstLine = true,
-                firstLineReservedChars = format.firstLineReservedChars + firstLineContent(null).length,
+                firstLineReservedChars = format.firstLineReservedChars + removeColor(firstLineContent(null)).length,
                 regularIndent = format.regularIndent + 1
             )
         }
@@ -192,12 +193,13 @@ data class LetBinding(
 
     private val fitsInSingleLine: (Pair<Format, Line>) -> Boolean
         get() = { pair ->
-            firstLineContent(pair.second.content).length <= calcRemainingUnoccupiedChars(pair.first)
+            removeColor(firstLineContent(pair.second.content)).length <= calcRemainingUnoccupiedChars(pair.first)
         }
 
     private val firstLineContent: (String?) -> String
         get() = { s ->
             val content = if (s == null) "" else "$s"
-            "let $exprBinder = $content"
+            config.colorLet +"let" + config.colorReset + " " + config.colorLetBinder + exprBinder + config.colorReset + " = " + content
         }
+
 }

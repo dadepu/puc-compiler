@@ -44,7 +44,7 @@ data class Conditional(
     private val exprFalse: Printable = parseExpr(content.elseBranch)
 
     private val minimumCharBreakingPoint: Int
-        get() = firstLineSingleLineCondition("").length + 5
+        get() = removeColor(firstLineSingleLineCondition("")).length + 5
 
 
     override fun generateOutput(f: (LineMode) -> Format): Pair<LineMode, List<Line>> {
@@ -110,9 +110,9 @@ data class Conditional(
         get() = { format ->
             format.copy(
                 continuesFirstLine = true,
-                firstLineReservedChars = format.firstLineReservedChars + singleLineFullConditional(
+                firstLineReservedChars = format.firstLineReservedChars + removeColor(singleLineFullConditional(
                     Triple("", "", "")
-                ).length,
+                )).length,
                 regularIndent = format.regularIndent + 1
             )
         }
@@ -132,14 +132,14 @@ data class Conditional(
             if (hasMinimumSpaceInFirstLine(format)) {
                 format.copy(
                     continuesFirstLine = true,
-                    firstLineReservedChars = format.firstLineReservedChars + firstLineMultiLineCondition("").length,
+                    firstLineReservedChars = format.firstLineReservedChars + removeColor(firstLineMultiLineCondition("")).length,
                     regularIndent = format.regularIndent + 1
                 )
             } else {
                 format.copy(
                     continuesFirstLine = true,
                     firstLineReservedIndent = format.regularIndent,
-                    firstLineReservedChars = firstLineMultiLineCondition("").length,
+                    firstLineReservedChars = removeColor(firstLineMultiLineCondition("")).length,
                     regularIndent = format.regularIndent
                 )
             }
@@ -182,7 +182,7 @@ data class Conditional(
 
     private val fitsLine: (Int) -> (String) -> Boolean
         get() = { occupied -> { condition ->
-            condition.length + occupied <= config.lineWrap
+            removeColor(condition).length + occupied <= config.lineWrap
         }}
 
     private val hasMinimumSpaceInFirstLine: (Format) -> Boolean
@@ -192,22 +192,22 @@ data class Conditional(
 
     private val singleLineFullConditional: (Triple<String, String, String>) -> String
         get() = { triple ->
-            "if ${triple.first} then ${triple.second} else ${triple.third}"
+            config.colorIf + "if" + config.colorReset + " " + triple.first + " " + config.colorThen + "then" + config.colorReset + " " + triple.second + " " + config.colorElse +"else" + config.colorReset + " " + triple.third
         }
 
     private val firstLineSingleLineCondition: (String) -> String
         get() = { condition ->
-            "if $condition then"
+            config.colorIf + "if" + config.colorReset + " " + condition + " " + config.colorThen + "then" + config.colorReset
         }
 
     private val firstLineMultiLineCondition: (String) -> String
         get() = { condition ->
-            "if $condition"
+            config.colorIf + "if" + config.colorReset + " " + condition
         }
 
     private val multiLineElseToken: () -> String
-        get() = { "else" }
+        get() = { config.colorElse + "else" + config.colorReset }
 
     private val multiLineThenToken: () -> String
-        get() = { "then" }
+        get() = { config.colorThen + "then" + config.colorReset }
 }

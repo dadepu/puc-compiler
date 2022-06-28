@@ -22,25 +22,25 @@ val parseExpr: (Expr) -> Printable = { expr ->
 
 val parseOp: (Operator) -> String = { op ->
     when (op) {
-        Operator.Add        -> "+"
-        Operator.Subtract   -> "-"
-        Operator.Multiply   -> "*"
-        Operator.Divide     -> "/"
-        Operator.Power      -> "^"
-        Operator.Equality   -> "=="
-        Operator.And        -> "&&"
-        Operator.Or         -> "||"
+        Operator.Add        -> config.colorAddOperator + "+" + config.colorReset
+        Operator.Subtract   -> config.colorSubtractOperator + "-" + config.colorReset
+        Operator.Multiply   -> config.colorMultiplyOperator + "*" + config.colorReset
+        Operator.Divide     -> config.colorDivideOperator + "/" + config.colorReset
+        Operator.Power      -> config.colorPowerOperator + "^" + config.colorReset
+        Operator.Equality   -> config.colorEqualityOperator +"==" + config.colorReset
+        Operator.And        -> config.colorAndOperator + "&&" + config.colorReset
+        Operator.Or         -> config.colorOrOperator + "||" + config.colorReset
     }
 }
 
 val parseIntLiteral: (Expr.IntLiteral) -> String
-    get() = { x -> x.num.toString() }
+    get() = { x -> config.colorIntLiteral + x.num.toString() + config.colorReset }
 
 val parseBoolLiteral: (Expr.BoolLiteral) -> String
-    get() = { x -> x.bool.toString() }
+    get() = { x -> config.colorBoolLiteral + x.bool.toString() + config.colorReset }
 
 val parseVariable: (Expr.Var) -> String
-    get() = { x -> x.name }
+    get() = { x -> config.colorVariable + x.name  + config.colorReset }
 
 val parseIndent: (Int) -> String
     get() = { x -> IntRange(0, (x * config.indentSize) - 1).fold("") { acc, _ -> "$acc " } }
@@ -101,3 +101,6 @@ val appendTokenToLastLine: (String) -> (List<Line>) -> List<Line>
         val previousLines = if (lines.size > 1) lines.subList(0, lines.size - 1) else listOf()
         previousLines + listOf(lastLine.copy(content = "${lastLine.content}$token"))
     }}
+
+val removeColor: (String) -> String
+    get() = { string -> string.replace(Regex("\u001B\\[[0-9];?[0-9]{0,2}m"), "") }

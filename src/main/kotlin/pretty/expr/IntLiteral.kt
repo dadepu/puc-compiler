@@ -2,6 +2,7 @@ package pretty.expr
 
 import pretty.*
 import pretty.functions.*
+import pretty.utilities.config
 
 data class IntLiteral(
 
