@@ -75,9 +75,9 @@ fun eval(env: Env, expr: Expr): Value {
       placeholder.forEach{
         val value  = env.get(it) ?: throw Exception("illegal variable placeholder §$it")
         when (value) {
-          is Value.Int -> formatedString = formatedString.replace(Regex("§$it((?= )|(?=$)|(?=\u001B))"), value.num.toString())
-          is Value.String ->  formatedString = formatedString.replace(Regex("§$it((?= )|(?=$)|(?=\u001B))"), value.string)
-          is Value.Bool ->  formatedString = formatedString.replace(Regex("§$it((?= )|(?=$)|(?=\u001B))"), value.bool.toString())
+          is Value.Int -> formatedString = formatedString.replace(Regex("§$it((?= )|(?=$)|(?=\u001B)|(?=,)|(?=:))"), value.num.toString())
+          is Value.String ->  formatedString = formatedString.replace(Regex("§$it((?= )|(?=$)|(?=\u001B)|(?=,)|(?=:))"), value.string)
+          is Value.Bool ->  formatedString = formatedString.replace(Regex("§$it((?= )|(?=$)|(?=\u001B)|(?=,)|(?=:))"), value.bool.toString())
           is Value.Closure -> throw Exception("function is Not allowed as replacement: $value")
         }
       }
@@ -236,7 +236,7 @@ fun findPrintVariables(string: String) : List<String> {                         
   if (indexOfPlaceholder == -1)
     return emptyList()
   val examineString = string.substring(indexOfPlaceholder,string.length)
-  var cutIndex = examineString.indexOfAny(charArrayOf(' ','§','\u001B'),1)
+  var cutIndex = examineString.indexOfAny(charArrayOf(' ','§','\u001B',':',','),1)
   if (cutIndex == -1)
     cutIndex = examineString.length
   val placeholder = examineString.substring(1,cutIndex)

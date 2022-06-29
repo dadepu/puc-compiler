@@ -95,21 +95,21 @@ fun main() {
 
   testInput(true,true,true, true, """
       let _ = print("") in
-      let _ = print("            ____":red) in
-      let _ = print("        .-/      \-.":red) in
-      let _ = print("       /            \":red) in
-      let _ = print("      |              |":red) in
-      let _ = print("      |,  .-.  .-.  ,|":red) in
-      let _ = print("      | )(__/  \__)( |":red) in
-      let _ = print("      |/     /\     \|":red) in
-      let _ = print("      (_     ^^     _)":red) in
-      let _ = print("       \__|IIIIII|__/":red) in
-      let _ = print("        | \IIIIII/ |":red) in
-      let _ = print("        \          /":red) in
-      let _ = print("         `--------`":red) in
-      let _ = print("--------------------------------":blue) in
-      let _ = print("💀 THE INSANE FORTUNE TELLER  💀":purple) in
-      let _ = print("--------------------------------":blue) in
+      let _ = print("                                          ____":red) in
+      let _ = print("                                      .-/      \-.":red) in
+      let _ = print("                                     /            \":red) in
+      let _ = print("                                    |              |":red) in
+      let _ = print("                                    |,  .-.  .-.  ,|":red) in
+      let _ = print("                                    | )(__/  \__)( |":red) in
+      let _ = print("                                    |/     /\     \|":red) in
+      let _ = print("                                    (_     ^^     _)":red) in
+      let _ = print("                                     \__|IIIIII|__/":red) in
+      let _ = print("                                      | \IIIIII/ |":red) in
+      let _ = print("                                      \          /":red) in
+      let _ = print("                                       `--------`":red) in                    
+      let _ = print("--------------------------------------------------------------------------------------------":blue) in
+      let _ = print("                              💀 THE INSANE FORTUNE TELLER  💀                              ":purple) in
+      let _ = print("--------------------------------------------------------------------------------------------":blue) in
       
       let rec readName = \x => let _ = print("Bitte geben Sie Ihren Namen ein: ":blue) in
       let input = read(String) in 
@@ -131,10 +131,17 @@ fun main() {
       let input = read(Int) in
       if input == 0-2147483647 || input < 0 then let _ = print("Keine gültige Anzahl!!!":red) in readBeer 0 else input in
       
+      let rec readBooze = \x =>  let _ = print("Trinken Sie regelmäßig Hochprozentigen (ja/nein): ":blue) in
+      let input = read(String) in
+      if input != "nein" && input != "ja" then let _ = print("Keine gültige Antwort!!!":red) in readBooze 0 else if input=="ja" then true else false in
+      
       let rec readHeadache = \x => let _ = print("Wie stark waren Ihre letzten Kopfschmerzen auf einer Skala von 1 bis 10?: ":blue) in 
       let input = read(Int) in
       if input == 0-2147483647 || input < 0 || input > 10 then let _ = print("Keine gültige Angabe!!!":red) in readHeadache 0 else input in
       
+      let rec readHeadacheDay = \x => let _ = print("Vor wie vielen Tagen hatten Sie die Kopfschmerzen ca.?: ":blue) in 
+      let input = read(Int) in
+      if input == 0-2147483647 || input < 0 then let _ = print("Keine gültige Angabe!!!":red) in readHeadacheDay 0 else input in
 
  
       let name = readName 0 in 
@@ -142,12 +149,45 @@ fun main() {
       let month = readBirthMonth 0 in 
       let cigarettes = readCigarettes 0 in 
       let beer = readBeer 0 in 
-      let headache = readHeadache 0 in 
+      let booze = readBooze 0 in 
+      let headache = readHeadache 0 in
+      let headacheDay = readHeadacheDay 0 in 
       
-      print("Hallo §name")
-     
+      
+      let deathTime = switch(age%month) {
+        case <=3: age + (age%month)^2 + 2
+        case <=6: age + (age%month)^2 + 4
+        case <=9: age + (age%month)^2 + 8
+        default: age + (age%month)^2 + 16
+      } in
+
+      let injury = switch((cigarettes+beer+6)% if booze then 5 else 6) {
+        case 0: "einer Infektion am Bein"
+        case 1: "einem Genickbruch"
+        case 2: "hohem Blutverlust"
+        case 3: "einem Herzinfarkt"
+        case 4: "einer Vergiftung"
+        default: "multiplem Organversagen"
+      } in
+
+      let causeOfDeath = switch((headache+headacheDay+6)%6) {
+        case 0: "einen Biss eines atomar verseuchten Bieber"
+        case 1: "einen Sturz von einem Hochhaus"
+        case 2: "einen Ausrutscher in der Dusche"
+        case 3: "einen plötzlichen Lachanfall"
+        case 4: "einen Flugzeugabsturz"
+        default: "einen Mückenstich"
+      } in
+      
+            
+      let _ = print("--------------------------------------------------------------------------------------------":blue) in
+      let _ = if deathTime >= 80 
+              then print("Der Wahrsager prophezeit dir gute Neuigkeiten:":green)
+              else print("Der Wahrsager prophezeit dir schlechte Neuigkeiten:":red) 
+              in
+      let _ = print("Hi §name: du stirbst im Alter von §deathTime Jahren an §injury durch §causeOfDeath":yellow) in
+      print("--------------------------------------------------------------------------------------------":blue)
    """
   )
-
 
 }
