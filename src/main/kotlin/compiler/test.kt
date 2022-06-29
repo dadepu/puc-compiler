@@ -185,7 +185,7 @@ fun main() {
               then print("Der Wahrsager prophezeit dir gute Neuigkeiten:":green)
               else print("Der Wahrsager prophezeit dir schlechte Neuigkeiten:":red) 
               in
-      let _ = print("Hi §name: du stirbst im Alter von §deathTime Jahren an §injury durch §causeOfDeath":yellow) in
+      let _ = print("Hi §name: du stirbst im Alter von §deathTime Jahren an §injury verursacht durch §causeOfDeath":yellow) in
       print("--------------------------------------------------------------------------------------------":blue)
    """
   )
