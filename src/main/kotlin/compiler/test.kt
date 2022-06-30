@@ -143,7 +143,6 @@ fun main() {
       let input = read(Int) in
       if input == 0-2147483647 || input < 0 then let _ = print("Keine gültige Angabe!!!":red) in readHeadacheDay 0 else input in
 
- 
       let name = readName 0 in 
       let age = readAge 0 in 
       let month = readBirthMonth 0 in 
@@ -185,7 +184,7 @@ fun main() {
               then print("Der Wahrsager prophezeit dir gute Neuigkeiten:":green)
               else print("Der Wahrsager prophezeit dir schlechte Neuigkeiten:":red) 
               in
-      let _ = print("Hi §name: du stirbst im Alter von §deathTime Jahren an §injury verursacht durch §causeOfDeath":yellow) in
+      let _ = print("§name, du stirbst im Alter von §deathTime Jahren an §injury verursacht durch §causeOfDeath":yellow) in
       print("--------------------------------------------------------------------------------------------":blue)
    """
   )

@@ -73,11 +73,12 @@ fun eval(env: Env, expr: Expr): Value {
       val placeholder = findPrintVariables(expr.string)
       var formatedString = expr.string
       placeholder.forEach{
-        val value  = env.get(it) ?: throw Exception("illegal variable placeholder §$it")
+        val value  = env.get(it) ?: throw Exception("illegal placeholder in print: §$it")
+        val replacementPattern = Regex("§$it((?= )|(?=$)|(?=\u001B)|(?=,)|(?=:))")
         when (value) {
-          is Value.Int -> formatedString = formatedString.replace(Regex("§$it((?= )|(?=$)|(?=\u001B)|(?=,)|(?=:))"), value.num.toString())
-          is Value.String ->  formatedString = formatedString.replace(Regex("§$it((?= )|(?=$)|(?=\u001B)|(?=,)|(?=:))"), value.string)
-          is Value.Bool ->  formatedString = formatedString.replace(Regex("§$it((?= )|(?=$)|(?=\u001B)|(?=,)|(?=:))"), value.bool.toString())
+          is Value.Int -> formatedString = formatedString.replace(replacementPattern, value.num.toString())
+          is Value.String ->  formatedString = formatedString.replace(replacementPattern, value.string)
+          is Value.Bool ->  formatedString = formatedString.replace(replacementPattern, value.bool.toString())
           is Value.Closure -> throw Exception("function is Not allowed as replacement: $value")
         }
       }

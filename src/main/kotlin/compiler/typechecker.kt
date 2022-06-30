@@ -124,7 +124,9 @@ fun infer(ctx: Context, expr: Expr): MonoType {
     is Expr.Print -> {                                                                                                  /**<====== PRINT =======>**/
       val variables = findPrintVariables(expr.string)
       variables.forEach() { name ->
-          infer(ctx,Expr.Var(name))
+          val type : MonoType = infer(ctx,Expr.Var(name))
+          if (type is MonoType.FunType)
+            throw Exception("illegal variable type in print: $type ")
       }
       MonoType.IntTy
       }
