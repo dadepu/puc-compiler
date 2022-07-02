@@ -33,13 +33,13 @@ val parseOp: (Operator) -> String = { op ->
         Operator.Equality       -> config.colorEqualityOperator +"==" + config.colorReset
         Operator.And            -> config.colorAndOperator + "&&" + config.colorReset
         Operator.Or             -> config.colorOrOperator + "||" + config.colorReset
-        Operator.Modulo         -> "%" // TODO("COLOR")
-        Operator.Inequality     -> "!="
-        Operator.GreaterThan    -> ">"
-        Operator.GreaterEqualThan -> ">="
-        Operator.LessThan       -> "<"
-        Operator.LessEqualThan  -> "<="
-        Operator.Concat         -> "#"
+        Operator.Modulo         -> config.colorModuloOperator + "%" + config.colorReset
+        Operator.Inequality     -> config.colorUnequalOperator + "!=" + config.colorReset
+        Operator.GreaterThan    -> config.colorGreaterThanOperator + ">" + config.colorReset
+        Operator.GreaterEqualThan -> config.colorGreaterEqualThanOperator + ">=" + config.colorReset
+        Operator.LessThan       -> config.colorSmallerThanOperator + "<" + config.colorReset
+        Operator.LessEqualThan  -> config.colorSmallerEqualThanOperator + "<=" + config.colorReset
+        Operator.Concat         -> config.colorConcatOperator + "#" + config.colorReset
     }
 }
 

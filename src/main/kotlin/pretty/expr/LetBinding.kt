@@ -202,7 +202,8 @@ data class LetBinding(
         get() = { s ->
             val content = if (s == null) "" else "$s"
             StringBuilder()
-                .append(config.colorLet + "let${(if (exprRec) " rec" else "")}" + config.colorReset)
+                .append(config.colorLet + "let" + config.colorReset)
+                .append(config.colorLetRec + (if (exprRec) " rec" else "") + config.colorReset)
                 .append(config.colorLetBinder + " $exprBinder" + config.colorReset)
                 .append(" = $content")
                 .toString()

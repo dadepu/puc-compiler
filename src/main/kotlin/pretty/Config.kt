@@ -10,6 +10,7 @@ data class Config(
     val colorAppLRParent: String = ConsoleColor.RESET,
 
     val colorLet: String = ConsoleColor.BLUE_BOLD,
+    val colorLetRec: String = ConsoleColor.YELLOW_BOLD,
     val colorIn: String = ConsoleColor.BLUE_BOLD,
     val colorLetBinder: String = ConsoleColor.RESET,
 
@@ -25,6 +26,12 @@ data class Config(
     val colorBoolLiteral: String = ConsoleColor.BLUE_BOLD,
     val colorIntLiteral: String = ConsoleColor.BLUE,
     val colorVariable: String = ConsoleColor.PURPLE,
+    val colorStringLiteral: String = ConsoleColor.GREEN,
+
+    val colorPrintString: String = ConsoleColor.GREEN,
+    val colorPrintColor: String = ConsoleColor.YELLOW_BOLD,
+
+    val colorReadType: String = ConsoleColor.YELLOW_BOLD,
 
     val colorOrOperator: String = ConsoleColor.RESET,
     val colorAndOperator: String = ConsoleColor.RESET,
@@ -34,6 +41,13 @@ data class Config(
     val colorMultiplyOperator: String = ConsoleColor.RESET,
     val colorDivideOperator: String = ConsoleColor.RESET,
     val colorPowerOperator: String = ConsoleColor.RESET,
+    val colorModuloOperator: String = ConsoleColor.RESET,
+    val colorUnequalOperator: String = ConsoleColor.RESET,
+    val colorGreaterThanOperator: String = ConsoleColor.RESET,
+    val colorGreaterEqualThanOperator: String = ConsoleColor.RESET,
+    val colorSmallerThanOperator: String = ConsoleColor.RESET,
+    val colorSmallerEqualThanOperator: String = ConsoleColor.RESET,
+    val colorConcatOperator: String = ConsoleColor.RESET,
 
 
     /*

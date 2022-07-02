@@ -5,6 +5,7 @@ import pretty.Format
 import pretty.Line
 import pretty.LineMode
 import pretty.Printable
+import pretty.utilities.config
 
 data class StringLiteral(
 
@@ -15,7 +16,11 @@ data class StringLiteral(
     override fun generateOutput(f: (LineMode) -> Format): Pair<LineMode, List<Line>> {
         return Pair(
             LineMode.SINGLE,
-            listOf(Line(f(LineMode.SINGLE).regularIndent, "\"${content.string}\""))
+            listOf(
+                Line(f(LineMode.SINGLE).regularIndent, colorLiteral("\"${content.string}\"")))
         )
     }
+
+    private val colorLiteral: (String) -> String
+        get() = { s -> "${config.colorStringLiteral}${s}${config.colorReset}"}
 }
