@@ -17,6 +17,7 @@ val parseExpr: (Expr) -> Printable = { expr ->
         is Expr.IntLiteral  -> IntLiteral(expr)
         is Expr.BoolLiteral -> BoolLiteral(expr)
         is Expr.Var         -> Variable(expr)
+        is Expr.StringLiteral -> StringLiteral(expr)
         else -> TODO("Type not implemented yet.")
     }
 }

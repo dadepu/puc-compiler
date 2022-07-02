@@ -14,6 +14,7 @@ fun main() {
         let b = 2 in
         let c = (\x => a + b * a / b ^ 2) in
         let d = c 2 in
+        let s = "abc123" in
         if d == b && d == a && true == true then a * a * a * a else b + b + b
     """.trimIndent())
 //
