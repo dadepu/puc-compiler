@@ -1,9 +1,9 @@
 package pretty
 
+import compiler.Lexer
+import compiler.Parser
 import pretty.functions.parseExpr
 import pretty.functions.parseIndent
-import v15project_print_v2.Lexer
-import v15project_print_v2.Parser
 
 class PrettyPrinter {
 

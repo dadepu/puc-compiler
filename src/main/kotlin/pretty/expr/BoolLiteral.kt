@@ -1,11 +1,11 @@
 package pretty.expr
 
+import compiler.Expr
 import pretty.Format
 import pretty.Line
 import pretty.LineMode
 import pretty.Printable
 import pretty.functions.*
-import v15project_print_v2.Expr
 
 data class BoolLiteral(
 

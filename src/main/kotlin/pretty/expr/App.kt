@@ -1,5 +1,6 @@
 package pretty.expr
 
+import compiler.Expr
 import functions.andThen
 import pretty.Format
 import pretty.Line
@@ -7,7 +8,6 @@ import pretty.LineMode
 import pretty.Printable
 import pretty.functions.*
 import pretty.utilities.config
-import v15project_print_v2.Expr
 
 /*
 

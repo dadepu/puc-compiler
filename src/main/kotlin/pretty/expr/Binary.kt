@@ -1,10 +1,10 @@
 package pretty.expr
 
+import compiler.Expr
 import functions.*
 import pretty.*
 import pretty.functions.*
 import pretty.utilities.config
-import v15project_print_v2.Expr
 
 /*
     Binaries are chained by nesting.

@@ -1,9 +1,11 @@
 package pretty.expr
 
-import pretty.*
-import pretty.functions.*
-import pretty.utilities.config
-import v15project_print_v2.Expr
+import compiler.Expr
+import pretty.Format
+import pretty.Line
+import pretty.LineMode
+import pretty.Printable
+import pretty.functions.parseIntLiteral
 
 data class IntLiteral(
 

@@ -1,10 +1,10 @@
 package pretty.functions
 
+import compiler.Expr
+import compiler.Operator
 import pretty.*
 import pretty.expr.*
 import pretty.utilities.config
-import v15project_print_v2.Expr
-import v15project_print_v2.Operator
 
 
 val parseExpr: (Expr) -> Printable = { expr ->
