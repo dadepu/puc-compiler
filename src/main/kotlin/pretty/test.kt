@@ -1,18 +1,16 @@
 package pretty
 
 /*
-        - let recursive 'rec'
         - print
         - read
             - read(Int)
             - read(String)
         - strings
-        - text-highlighting
  */
 
 fun main() {
         testInput("""      
-        let a = 3 + 2 in
+        let rec a = 3 + 2 in
         let b = 2 in
         let c = (\x => a + b * a / b ^ 2) in
         let d = c 2 in

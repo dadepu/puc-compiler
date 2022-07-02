@@ -52,6 +52,8 @@ data class LetBinding(
 
     private val exprBinder: String = content.binder
 
+    private val exprRec: Boolean = content.recursive
+
     private val exprExpr: Printable = parseExpr(content.expr)
 
     private val exprBody: Printable = parseExpr(content.body)
@@ -199,7 +201,11 @@ data class LetBinding(
     private val firstLineContent: (String?) -> String
         get() = { s ->
             val content = if (s == null) "" else "$s"
-            config.colorLet +"let" + config.colorReset + " " + config.colorLetBinder + exprBinder + config.colorReset + " = " + content
+            StringBuilder()
+                .append(config.colorLet + "let${(if (exprRec) " rec" else "")}" + config.colorReset)
+                .append(config.colorLetBinder + " $exprBinder" + config.colorReset)
+                .append(" = $content")
+                .toString()
         }
 
 }
