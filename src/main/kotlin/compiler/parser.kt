@@ -1,4 +1,4 @@
-package v15project_print_v2
+package compiler
 import kotlinx.collections.immutable.persistentHashMapOf
 
 sealed class Token {
@@ -434,24 +434,24 @@ class Parser(val lexer: Lexer) {
     expect<Token.PRINT>("print")
     expect<Token.LPAREN>("(")
     val output = expect<Token.STRING_LIT>("string-lit")
-    val color: String? =
+    val color: Color? =
         if (lexer.lookahead() == Token.COLON) {
           expect<Token.COLON>(":")
           when (lexer.next()) {
-            Token.RED -> PrintColor.RED
-            Token.GREEN -> PrintColor.GREEN
-            Token.YELLOW -> PrintColor.YELLOW
-            Token.BLUE -> PrintColor.BLUE
-            Token.PURPLE -> PrintColor.PURPLE
-            Token.CYAN -> PrintColor.CYAN
-            Token.WHITE -> PrintColor.WHITE
+            Token.RED -> Color.Red
+            Token.GREEN -> Color.Green
+            Token.YELLOW -> Color.Yellow
+            Token.BLUE -> Color.Blue
+            Token.PURPLE -> Color.Purple
+            Token.CYAN -> Color.Cyan
+            Token.WHITE -> Color.White
             else -> throw Error("Expected color but got: ${lexer.lookahead()}")
           }
         } else{
           null
         }
     expect<Token.RPAREN>(")")
-    return if (color == null) Expr.Print(output.string) else Expr.Print(color + output.string + PrintColor.RESET)
+    return if (color == null) Expr.Print(output.string, null) else Expr.Print(output.string,color)
   }
 
   private fun parseLambda(): Expr.Lambda {
