@@ -1,4 +1,5 @@
 package compiler
+
 import kotlinx.collections.immutable.persistentHashMapOf
 
 sealed class Token {
