@@ -1,16 +1,16 @@
 package pretty
 
-import Lexer
-import Parser
 import pretty.functions.parseExpr
 import pretty.functions.parseIndent
+import v15project_print_v2.Lexer
+import v15project_print_v2.Parser
 
 class PrettyPrinter {
 
     fun format(input: () -> String, output: (String) -> Unit) {
         val parser = Parser(Lexer(input()))
         val expr = parser.parseExpression()
-//        println(expr)
+        println(expr)
 
         parseExpr(expr).generateOutput(rootFormat)
             .second

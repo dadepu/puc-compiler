@@ -1,10 +1,10 @@
 package pretty.functions
 
-import Expr
-import Operator
 import pretty.*
 import pretty.expr.*
 import pretty.utilities.config
+import v15project_print_v2.Expr
+import v15project_print_v2.Operator
 
 
 val parseExpr: (Expr) -> Printable = { expr ->
@@ -17,6 +17,7 @@ val parseExpr: (Expr) -> Printable = { expr ->
         is Expr.IntLiteral  -> IntLiteral(expr)
         is Expr.BoolLiteral -> BoolLiteral(expr)
         is Expr.Var         -> Variable(expr)
+        else -> TODO("Type not implemented yet.")
     }
 }
 
@@ -30,6 +31,7 @@ val parseOp: (Operator) -> String = { op ->
         Operator.Equality   -> config.colorEqualityOperator +"==" + config.colorReset
         Operator.And        -> config.colorAndOperator + "&&" + config.colorReset
         Operator.Or         -> config.colorOrOperator + "||" + config.colorReset
+        else -> TODO("Type not implemented yet.")
     }
 }
 
