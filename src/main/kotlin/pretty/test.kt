@@ -1,7 +1,6 @@
 package pretty
 
 /*
-        - compiler
         - let recursive 'rec'
         - print
         - read
