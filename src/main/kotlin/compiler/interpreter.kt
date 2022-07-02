@@ -1,10 +1,11 @@
-package v15project_print_v2
+package compiler
 import kotlinx.collections.immutable.PersistentMap
 import kotlinx.collections.immutable.persistentHashMapOf
-import v15project_print_v2.Operator.*
+import compiler.Operator.*
 import java.util.*
 
 sealed class Expr {
+
   data class Var(val name: String) : Expr()
   data class Lambda(val binder: String, val tyBinder: MonoType?, val body: Expr) : Expr()
   data class App(val func: Expr, val arg: Expr) : Expr()
@@ -12,7 +13,7 @@ sealed class Expr {
   data class Binary(val left: Expr, val op: Operator, val right: Expr) : Expr()
   data class Let(val recursive: Boolean, val binder: String, val expr: Expr, val body: Expr) : Expr()
   data class Read(val type: ReadType) : Expr()                                                                          /**<====== READ =======>**/
-  data class Print(val string: String) : Expr()                                                                         /**<====== PRINT =======>**/
+  data class Print(val string: String, val color: Color?) : Expr()                                                      /**<====== PRINT =======>**/
 
   data class IntLiteral(val num: Int) : Expr()
   data class BoolLiteral(val bool: Boolean) : Expr()
@@ -22,6 +23,16 @@ sealed class Expr {
 enum class ReadType {                                                                                                   /**<====== READ =======>**/
   Int,
   String
+}
+
+enum class Color {                                                                                                      /**<====== PRINT =======>**/
+  Red,
+  Green,
+  Yellow,
+  Blue,
+  Purple,
+  Cyan,
+  White
 }
 
 enum class Operator {                                                                                                   /**<====== OPERTAORE =======>**/
@@ -53,9 +64,6 @@ sealed class Value {
 
 fun eval(env: Env, expr: Expr): Value {
   return when (expr) {
-    is Expr.IntLiteral -> Value.Int(expr.num)
-    is Expr.BoolLiteral -> Value.Bool(expr.bool)
-    is Expr.StringLiteral -> Value.String(expr.string)
     is Expr.Read -> {                                                                                                   /**<====== READ =======>**/
       val reader = Scanner(System.`in`)
       when(expr.type) {
@@ -69,6 +77,9 @@ fun eval(env: Env, expr: Expr): Value {
         ReadType.String -> Value.String(reader.next())
       }
     }
+    is Expr.IntLiteral -> Value.Int(expr.num)
+    is Expr.BoolLiteral -> Value.Bool(expr.bool)
+    is Expr.StringLiteral -> Value.String(expr.string)
     is Expr.Print -> {                                                                                                  /**<====== PRINT =======>**/
       val placeholder = findPrintVariables(expr.string)
       var formatedString = expr.string
@@ -82,7 +93,20 @@ fun eval(env: Env, expr: Expr): Value {
           is Value.Closure -> throw Exception("function is Not allowed as replacement: $value")
         }
       }
-      println(formatedString)
+      val colorCode: String? = when (expr.color) {
+            Color.Red -> PrintColor.RED
+            Color.Green -> PrintColor.GREEN
+            Color.Yellow -> PrintColor.YELLOW
+            Color.Blue -> PrintColor.BLUE
+            Color.Purple -> PrintColor.PURPLE
+            Color.Cyan -> PrintColor.CYAN
+            Color.White -> PrintColor.WHITE
+            null -> null
+      }
+      if (colorCode == null)
+        println(formatedString)
+      else
+        println(colorCode + formatedString + PrintColor.RESET)
       Value.Int(expr.string.count() * 2)
     }
     is Expr.Binary -> {

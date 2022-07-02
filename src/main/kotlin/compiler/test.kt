@@ -1,4 +1,4 @@
-package v15project_print_v2
+package compiler
 
 import kotlinx.collections.immutable.persistentHashMapOf
 
@@ -170,12 +170,12 @@ fun main() {
       } in
 
       let causeOfDeath = switch((headache+headacheDay+6)%6) {
-        case 0: "einen Biss eines atomar verseuchten Bieber"
-        case 1: "einen Sturz von einem Hochhaus"
-        case 2: "einen Ausrutscher in der Dusche"
-        case 3: "einen plötzlichen Lachanfall"
-        case 4: "einen Flugzeugabsturz"
-        default: "einen Mückenstich"
+        case 0: "einen Biss eines atomar verseuchten Bieber."
+        case 1: "einen Sturz von einem Hochhaus."
+        case 2: "einen Ausrutscher in der Dusche."
+        case 3: "einen plötzlichen Lachanfall."
+        case 4: "einen Flugzeugabsturz."
+        default: "einen Mückenstich."
       } in
       
             
