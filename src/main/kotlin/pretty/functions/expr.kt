@@ -19,21 +19,27 @@ val parseExpr: (Expr) -> Printable = { expr ->
         is Expr.Var         -> Variable(expr)
         is Expr.StringLiteral -> StringLiteral(expr)
         is Expr.Read        -> Read(expr)
-        else -> TODO("Type not implemented yet.")
+        is Expr.Print       -> Print(expr)
     }
 }
 
 val parseOp: (Operator) -> String = { op ->
     when (op) {
-        Operator.Add        -> config.colorAddOperator + "+" + config.colorReset
-        Operator.Subtract   -> config.colorSubtractOperator + "-" + config.colorReset
-        Operator.Multiply   -> config.colorMultiplyOperator + "*" + config.colorReset
-        Operator.Divide     -> config.colorDivideOperator + "/" + config.colorReset
-        Operator.Power      -> config.colorPowerOperator + "^" + config.colorReset
-        Operator.Equality   -> config.colorEqualityOperator +"==" + config.colorReset
-        Operator.And        -> config.colorAndOperator + "&&" + config.colorReset
-        Operator.Or         -> config.colorOrOperator + "||" + config.colorReset
-        else -> TODO("Type not implemented yet.")
+        Operator.Add            -> config.colorAddOperator + "+" + config.colorReset
+        Operator.Subtract       -> config.colorSubtractOperator + "-" + config.colorReset
+        Operator.Multiply       -> config.colorMultiplyOperator + "*" + config.colorReset
+        Operator.Divide         -> config.colorDivideOperator + "/" + config.colorReset
+        Operator.Power          -> config.colorPowerOperator + "^" + config.colorReset
+        Operator.Equality       -> config.colorEqualityOperator +"==" + config.colorReset
+        Operator.And            -> config.colorAndOperator + "&&" + config.colorReset
+        Operator.Or             -> config.colorOrOperator + "||" + config.colorReset
+        Operator.Modulo         -> "%" // TODO("COLOR")
+        Operator.Inequality     -> "!="
+        Operator.GreaterThan    -> ">"
+        Operator.GreaterEqualThan -> ">="
+        Operator.LessThan       -> "<"
+        Operator.LessEqualThan  -> "<="
+        Operator.Concat         -> TODO("Type not implemented yet.")
     }
 }
 

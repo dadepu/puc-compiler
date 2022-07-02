@@ -15,7 +15,11 @@ fun main() {
         let d = c 2 in
         let s = "abc123" in
         let r = read(Int) in
-        if d == b && d == a && true == true then a * a * a * a else b + b + b
+        let rec readCigarettes = \x => let _ = print("Bitte geben Sie die Anzahl an Zigaretten ein, die Sie in der Woche rauchen: ":blue) in
+      let input = read(Int) in 
+      if input == 0-2147483647 || input < 0 then let _ = print("Keine gültige Anzahl!!!":red) in readCigarettes 0 else input in
+        3
+        
     """.trimIndent())
 //
 //    println("-------------------------------")
