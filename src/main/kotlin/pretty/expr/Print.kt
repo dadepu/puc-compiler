@@ -1,5 +1,6 @@
 package pretty.expr
 
+import compiler.Color
 import compiler.Expr
 import pretty.Format
 import pretty.Line
@@ -15,7 +16,10 @@ data class Print(
     override fun generateOutput(f: (LineMode) -> Format): Pair<LineMode, List<Line>> {
         return Pair(
             LineMode.SINGLE,
-            listOf(Line(f(LineMode.SINGLE).regularIndent, "print(${content.string})"))
+            listOf(Line(f(LineMode.SINGLE).regularIndent, "print(\"${content.string}\"${colorToString(content.color)})"))
         )
     }
+
+    private val colorToString: (Color?) -> String
+        get() = { color -> ":${color?.toString()?.lowercase()}" }
 }
