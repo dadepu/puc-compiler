@@ -5,7 +5,6 @@ package pretty
         - read
             - read(Int)
             - read(String)
-        - strings
  */
 
 fun main() {
@@ -15,6 +14,7 @@ fun main() {
         let c = (\x => a + b * a / b ^ 2) in
         let d = c 2 in
         let s = "abc123" in
+        let r = read(Int) in
         if d == b && d == a && true == true then a * a * a * a else b + b + b
     """.trimIndent())
 //
