@@ -39,7 +39,7 @@ val parseOp: (Operator) -> String = { op ->
         Operator.GreaterEqualThan -> ">="
         Operator.LessThan       -> "<"
         Operator.LessEqualThan  -> "<="
-        Operator.Concat         -> TODO("Type not implemented yet.")
+        Operator.Concat         -> "#"
     }
 }
 
