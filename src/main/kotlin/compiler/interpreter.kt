@@ -65,23 +65,7 @@ sealed class Value {
 
 fun eval(env: Env, expr: Expr): Value {
   return when (expr) {
-    is Expr.Read -> {                                                                                                   /**<====== READ =======>**/
-      val reader = Scanner(System.`in`)
-      when(expr.type) {
-        ReadType.Int -> Value.Int(
-                                  try {
-                                    reader.nextInt()
-                                  } catch (e: InputMismatchException) {
-                                    reader.next()
-                                    -2147483647
-                                  })
-        ReadType.String -> Value.String(reader.next())
-      }
-    }
-    is Expr.IntLiteral -> Value.Int(expr.num)
-    is Expr.BoolLiteral -> Value.Bool(expr.bool)
-    is Expr.StringLiteral -> Value.String(expr.string)
-    is Expr.Print -> {                                                                                                  /**<====== PRINT =======>**/
+     is Expr.Print -> {                                                                                                  /**<====== PRINT =======>**/
       val placeholder = findPrintVariables(expr.string)
       var formatedString = expr.string
       placeholder.forEach{
@@ -94,6 +78,8 @@ fun eval(env: Env, expr: Expr): Value {
           is Value.Closure -> throw Exception("function is Not allowed as replacement: $value")
         }
       }
+      // Interp. Color ...
+
       val colorCode: String? = when (expr.color) {
             Color.Red -> PrintColor.RED
             Color.Green -> PrintColor.GREEN
@@ -110,6 +96,23 @@ fun eval(env: Env, expr: Expr): Value {
         println(colorCode + formatedString + PrintColor.RESET)
       Value.Int(expr.string.count() * 2)
     }
+    is Expr.Read -> {                                                                                                   /**<====== READ =======>**/
+      val reader = Scanner(System.`in`)
+      when(expr.type) {
+        ReadType.Int -> Value.Int(
+                                  try {
+                                    reader.nextInt()
+                                  } catch (e: InputMismatchException) {
+                                    reader.next()
+                                    -2147483647
+                                  })
+        ReadType.String -> Value.String(reader.next())
+      }
+    }
+    is Expr.IntLiteral -> Value.Int(expr.num)
+    is Expr.BoolLiteral -> Value.Bool(expr.bool)
+    is Expr.StringLiteral -> Value.String(expr.string)
+
     is Expr.Binary -> {
       val left = eval(env, expr.left)
       val right = eval(env, expr.right)
