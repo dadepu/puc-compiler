@@ -24,7 +24,7 @@ data class Config(
     val colorElse: String = ConsoleColor.BLUE_BOLD,
 
     val colorBoolLiteral: String = ConsoleColor.BLUE_BOLD,
-    val colorIntLiteral: String = ConsoleColor.BLUE,
+    val colorIntLiteral: String = ConsoleColor.RED,
     val colorVariable: String = ConsoleColor.PURPLE,
     val colorStringLiteral: String = ConsoleColor.GREEN,
 
@@ -58,7 +58,7 @@ data class Config(
     /*
         Specifies at which point lines are wrapped. Including indentations.
      */
-    val lineWrap: Int = 60,
+    val lineWrap: Int = 100,
 
     /*
         Lambda-specific Configurations.
