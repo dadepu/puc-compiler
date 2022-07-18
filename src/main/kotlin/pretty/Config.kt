@@ -58,7 +58,7 @@ data class Config(
     /*
         Specifies at which point lines are wrapped. Including indentations.
      */
-    val lineWrap: Int = 100,
+    val lineWrap: Int = 80,
 
     /*
         Lambda-specific Configurations.

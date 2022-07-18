@@ -1,52 +1,36 @@
 package pretty
 
-/*
-        - print
-        - read
-            - read(Int)
-            - read(String)
- */
 
 fun main() {
-        testInput("""      
-        let rec a = 3 + 2 in
-        let b = 2 in
-        let c = (\x => a + b * a / b ^ 2) in
-        let d = c 2 in
-        let s = "abc123" in
-        let r = read(Int) in
-        let rec readCigarettes = \x => let _ = print("Bitte geben Sie die Anzahl an Zigaretten ein, die Sie in der Woche rauchen: ":blue) in
-      let input = read(Int) in 
-      if input == 0-2147483647 || input < 0 then let _ = print("Keine gültige Anzahl!!!":red) in readCigarettes 0 else input in
-        3
-        
+    testInput("""      
+      let rec readName = (\x => let _ = print("Bitte geben Sie Ihren Namen ein: ":blue) in
+      let input = read(String) in 
+      if input == "" || input == " " then let _ = print("Kein gültiger Name!!!":red) in readName 0 else input) in
+      let rec readAge = (\x => let _ = print("Bitte geben Sie Ihr Alter ein: ":blue) in
+      let input = read(Int) in
+      if input == 0-2147483647 || input <= 0 || input > 120  then let _ = print("Kein gültiges Alter!!!":red) in readAge 0 else input) in
+      let rec readBirthMonth = (\x => let _ = print("Bitte geben Sie Ihren Geburtsmonat als Zahl ein: ":blue) in
+      let input = read(Int) in
+      if input == 0-2147483647 || input <= 0 || input > 12 then let _ = print("Kein gültiger Monat!!!":red) in readBirthMonth 0 else input) in
+      let name = readName 0 in 
+      let age = readAge 0 in
+      let month = readBirthMonth 0 in
+      
+      let deathTime = switch(age%month) {
+        case <=3: age + (age%month)^2 + 2
+        case <=6: age + (age%month)^2 + 4
+        case <=9: age + (age%month)^2 + 8
+        default: age + (age%month)^2 + 16
+      } in
+      
+      let _ = if deathTime >= 80 
+              then print("Der Wahrsager prophezeit dir gute Neuigkeiten:":green)
+              else print("Der Wahrsager prophezeit dir schlechte Neuigkeiten:":red) 
+              in
+      let _ = print("§name, du stirbst im Alter von §deathTime Jahren an §injury verursacht durch §causeOfDeath":yellow) in
+      3
+      
     """.trimIndent())
-//
-//    println("-------------------------------")
-//
-//    testInput("""
-//        (\x => \y => \z => x + y + z ^ x - y * z ^ z - y * z ^ z - y * z ^ z) (1) (2) (3)
-//    """.trimIndent())
-//
-//    println("-------------------------------")
-//    testInput("""
-//        if let a = 3 in a == 3 then 1 + 1 + 1 + 1 else 2 + 2 + 2
-//    """.trimIndent())
-//
-//        println("-------------------------------")
-//    testInput("""
-//        let a = 3 in
-//        let b = 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 in
-//        a + b + b + b + b + b + b + b + b + b + b + b + b + b + b + b + b + b
-//    """.trimIndent())
-//
-//
-//    println("-------------------------------")
-//
-//    testInput("""
-//    let a = (\a -> \b -> \c -> \d -> \e -> a + b + c + d + e) in
-//    a 3
-//    """.trimIndent())
 }
 
 private fun testInput(input: String) {
