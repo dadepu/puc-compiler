@@ -62,6 +62,8 @@ data class Binary(
                     listOf(Pair(ContentType.LIT, parseIntLiteral(expr)))
                 is Expr.BoolLiteral ->
                     listOf(Pair(ContentType.LIT, parseBoolLiteral(expr)))
+                is Expr.StringLiteral ->
+                    listOf(Pair(ContentType.LIT, parseStringLiteral(expr)))
                 is Expr.Var         ->
                     listOf(Pair(ContentType.LIT, parseVariable(expr)))
 

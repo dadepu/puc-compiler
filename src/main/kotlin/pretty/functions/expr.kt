@@ -52,6 +52,9 @@ val parseBoolLiteral: (Expr.BoolLiteral) -> String
 val parseVariable: (Expr.Var) -> String
     get() = { x -> config.colorVariable + x.name  + config.colorReset }
 
+val parseStringLiteral: (Expr.StringLiteral) -> String
+    get() = { x -> config.colorStringLiteral + "\"${x.string}\"" + config.colorReset }
+
 val parseIndent: (Int) -> String
     get() = { x -> IntRange(0, (x * config.indentSize) - 1).fold("") { acc, _ -> "$acc " } }
 
