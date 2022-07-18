@@ -28,9 +28,9 @@ data class Print(
     private val colorString: (String) -> String
         get() = { s -> "${config.colorPrintString}${s}${config.colorReset}" }
 
-    private val colorColor: (String) -> String
+    private val colorColor: (String?) -> String?
         get() = { s -> "${config.colorPrintColor}${s}${config.colorReset}"}
 
-    private val colorToString: (Color?) -> String
-        get() = { color -> ":${color?.toString()?.lowercase()}" }
+    private val colorToString: (Color?) -> String?
+        get() = { color -> if (color != null) ":${color.toString().lowercase()}" else "" }
 }
